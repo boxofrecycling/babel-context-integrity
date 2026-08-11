@@ -35,23 +35,50 @@ jobs:
         run: ./action/test-local.sh
 
   no-network:
-    # The package claims it cannot reach anything. This job removes the ability
-    # to reach anything and runs the whole suite again.
+    # The package claims it cannot reach anything. This job takes the network
+    # away and runs the installed CLI anyway.
+    #
+    # It uses a `--network=none` container rather than an iptables rule on the
+    # runner. A rule matching the runner's own uid also severs the runner's
+    # connection to GitHub, so the job hangs instead of failing -- which is
+    # exactly what happened the first time this ran in public. Isolating the
+    # thing under test, rather than the machine running the test, is the fix.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Install
-        run: python -m pip install --disable-pip-version-check -e ".[dev]"
-      - name: Run with outbound network blocked
+      - name: Build a wheel (this step is allowed the network)
         run: |
-          sudo iptables -A OUTPUT -m owner --uid-owner "$(id -u)" \
-            ! -d 127.0.0.1 -j REJECT
-          python -m pytest -q
-          babelci lab
-          babelci demo > /dev/null
+          python -m pip install --disable-pip-version-check build
+          python -m build --wheel
+      - name: Install and run with no network interface at all
+        run: |
+          docker run --rm --network=none \
+            -v "$PWD:/w" -w /w python:3.12-slim bash -c '
+              set -e
+              pip install --no-index --no-deps --disable-pip-version-check dist/*.whl
+              babelci --version
+              babelci lab
+              babelci demo > /dev/null
+              babelci lab --out /tmp/fx > /dev/null
+              babelci verify /tmp/fx/clean-handoff.json --expect /tmp/fx/expect.json
+              babelci explain /tmp/fx/clean-handoff.json > /dev/null
+              babelci diff /tmp/fx/clean.json /tmp/fx/restart-resume.json > /dev/null
+              babelci schema > /dev/null
+              echo "every command ran with no network interface present"
+            '
+      - name: Prove the container really had no network
+        run: |
+          # If this succeeds, the isolation above proved nothing.
+          if docker run --rm --network=none python:3.12-slim \
+               python -c "import socket; socket.create_connection(('1.1.1.1', 53), 3)" \
+               2>/dev/null; then
+            echo "::error::--network=none container reached the network"
+            exit 1
+          fi
+          echo "confirmed: no route out of the container"
 
   self-check:
     # This repository verifies its own handoff artifact, which is the smallest
