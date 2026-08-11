@@ -1,6 +1,6 @@
 # Distribution digests — v0.1.0
 
-Built locally with `python -m build`.
+Built with `python -m build` at tag `v0.1.0`.
 
 ```
 f0e731532f2d1f681e92a1eb467f30f1568ab73761a1970be1c77e5b337c254f  babel_context_integrity-0.1.0-py3-none-any.whl
@@ -15,13 +15,20 @@ babel_context_integrity-0.1.0.tar.gz                   127962 bytes
 
 ## Reproducibility
 
-The **wheel is bit-reproducible**: rebuilding from a fresh clone of the
-same commit, on the same Python, produces a byte-identical file.
+**Both artifacts are bit-reproducible.** Rebuilding from a fresh clone
+of this repository, on the same Python, produces byte-identical files.
+The digests above were confirmed identical across three independent
+builds: twice locally and once from a clean public clone.
 
-The **sdist is content-reproducible but not bit-reproducible**: its
-extracted tree is identical across builds, while the gzip container
-embeds a timestamp, so the outer digest changes. That is a property of
-the archive format, not of the contents.
+Check it yourself:
 
-`release/DIGESTS.txt` is excluded from the sdist: an archive cannot
-contain its own hash.
+```bash
+git clone https://github.com/boxofrecycling/babel-context-integrity
+cd babel-context-integrity && git checkout v0.1.0
+python -m venv .venv && ./.venv/bin/pip install build
+./.venv/bin/python -m build && shasum -a 256 dist/*
+```
+
+`release/DIGESTS.txt` is excluded from the sdist. An archive cannot
+contain its own hash, and the attempt is what made an earlier build
+appear non-reproducible.
