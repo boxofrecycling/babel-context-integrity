@@ -81,7 +81,8 @@ LAYER_MEANING = {
 # ---------------------------------------------------------------------------
 
 # structure
-UNPARSEABLE = "UNPARSEABLE"
+# (Invalid JSON is a usage error at the CLI boundary, exit 2, not a finding:
+#  a file that does not parse has not been verified at all.)
 CONTRACT_VERSION_MISMATCH = "CONTRACT_VERSION_MISMATCH"
 SCHEMA_VIOLATION = "SCHEMA_VIOLATION"
 MALFORMED_DIGEST = "MALFORMED_DIGEST"

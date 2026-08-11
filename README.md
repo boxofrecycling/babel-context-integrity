@@ -173,7 +173,9 @@ babelci rules                         # why diff says SAFE/REVIEW/REFUSE
 ```
 
 Exit codes: `0` pass, `1` fail or refuse, `2` usage error, `3` review (with
-`diff --strict`). Full surface: [docs/CLI.md](docs/CLI.md).
+`diff --strict`). Full surface: [docs/CLI.md](docs/CLI.md). Every failure code
+it can print is documented in
+[docs/FINDING_CODES.md](docs/FINDING_CODES.md).
 
 ## Babel Diff
 

@@ -29,7 +29,8 @@ from .contract import (
     EXTERNAL_RECEIPT_WORLD_MISMATCH, LAYER_AUTHORITIES, LAYER_CHECKPOINT,
     LAYER_CONFLICTS, LAYER_CONSTRAINTS, LAYER_EXTERNAL, LAYER_IDENTITY,
     LAYER_PROVENANCE, LAYER_STRUCTURE, PROVENANCE_CHAIN_BROKEN, PROVENANCE_CYCLE,
-    PROVENANCE_EDGE_DANGLING, PROVENANCE_ROOT_UNDECLARED,
+    PRODUCER_IDENTITY_MISMATCH, PROVENANCE_EDGE_DANGLING,
+    PROVENANCE_ROOT_UNDECLARED,
     REQUIRED_OBJECT_MISSING, RETAINED_CONSTRAINT_MISSING,
     RETAINED_CONSTRAINT_MODIFIED,
     SEVERITY_FAIL, SEVERITY_NOTE, SUMMARY_COMMITMENT_MISMATCH, SUMMARY_DOMAIN,
@@ -145,6 +146,13 @@ def verify(handoff: Any, *, expectation: dict[str, Any] | None = None,
             layers.fail(LAYER_IDENTITY, TASK_IDENTITY_MISMATCH,
                         f"expected task_id {expected_task!r}, artifact declares {task_id!r}",
                         expected=expected_task, received=task_id)
+        expected_producer = expectation.get("producer")
+        actual_producer = handoff["producer"]["agent"]
+        if expected_producer is not None and expected_producer != actual_producer:
+            layers.fail(LAYER_IDENTITY, PRODUCER_IDENTITY_MISMATCH,
+                        f"expected producer {expected_producer!r}, "
+                        f"artifact declares {actual_producer!r}",
+                        expected=expected_producer, received=actual_producer)
         expected_consumer = expectation.get("consumer")
         actual_consumer = (handoff.get("consumer") or {}).get("agent")
         if expected_consumer is not None and expected_consumer != actual_consumer:

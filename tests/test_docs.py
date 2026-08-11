@@ -72,3 +72,24 @@ def test_examples_referenced_by_the_readme_exist():
     text = (ROOT / "README.md").read_text(encoding="utf-8")
     for name in re.findall(r"examples/([\w.-]+\.json)", text):
         assert (ROOT / "examples" / name).exists(), name
+
+
+def test_no_finding_code_is_dead():
+    """Every declared code must be emittable by some code path.
+
+    A code that nothing can produce is documentation of a check that does not
+    exist, which is the exact failure this project complains about.
+    """
+    from babelci import contract
+
+    declared = {
+        name for name in dir(contract)
+        if name.isupper() and isinstance(getattr(contract, name), str)
+        and getattr(contract, name) == name
+    }
+    sources = " ".join(
+        path.read_text(encoding="utf-8")
+        for path in (ROOT / "src" / "babelci").rglob("*.py")
+        if path.name != "contract.py")
+    unreachable = sorted(code for code in declared if code not in sources)
+    assert not unreachable, f"finding codes nothing can emit: {unreachable}"
