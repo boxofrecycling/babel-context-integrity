@@ -71,6 +71,10 @@ include = [
     "/CHANGELOG.md", "/CONTRIBUTING.md", "/SECURITY.md",
     "/RELEASE_CHECKLIST.md", "/release",
 ]
+# `release/DIGESTS.txt` records the digests *of these archives*, so shipping it
+# inside one is circular: the sdist could never contain its own hash, and the
+# attempt makes the sdist differ between builds for no useful reason.
+exclude = ["/release/DIGESTS.txt"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -1,15 +1,37 @@
 # Distribution digests — v0.1.0
 
 Built locally with `python -m build`. **Not uploaded anywhere.**
-Recompute with: `shasum -a 256 dist/*`
 
 ```
 62d7f896e4a7ea7e37068bde65ccabd98dcb58f6ebde4e90f197d8bbb7bea05c  babel_context_integrity-0.1.0-py3-none-any.whl
-793c3d72166fc0af6d4fd21a02decd071dbf199c4dc60611855505de8ae31e37  babel_context_integrity-0.1.0.tar.gz
+c63ae82fda7af21a3b100470fa5ee4079b4143e3f5b541ed678279377d5d3eb3  babel_context_integrity-0.1.0.tar.gz
 ```
 
 Sizes:
 ```
 babel_context_integrity-0.1.0-py3-none-any.whl          53543 bytes
-babel_context_integrity-0.1.0.tar.gz                   127991 bytes
+babel_context_integrity-0.1.0.tar.gz                   127779 bytes
 ```
+
+## Reproducibility
+
+The **wheel is bit-reproducible**: rebuilding from a fresh clone of the
+same commit, on the same Python, produces a byte-identical file. The
+digest above was confirmed identical across two independent trees.
+
+The **sdist is content-reproducible but not bit-reproducible**: its
+extracted tree is identical across builds, while the gzip container
+embeds a timestamp, so the outer digest changes. That is a property of
+the archive format, not of the contents, and it is recorded here rather
+than papered over.
+
+Verify either claim yourself:
+
+```bash
+shasum -a 256 dist/*
+# wheel: rebuild and compare digests
+# sdist: extract both and `diff -r` the trees
+```
+
+`release/DIGESTS.txt` is deliberately excluded from the sdist: an
+archive cannot contain its own hash.
