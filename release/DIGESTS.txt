@@ -1,17 +1,16 @@
 # Distribution digests — v0.1.0
 
-Built locally with `python -m build` at commit 8c54cfd.
-**Not uploaded anywhere.**
+Built locally with `python -m build`.
 
 ```
-62d7f896e4a7ea7e37068bde65ccabd98dcb58f6ebde4e90f197d8bbb7bea05c  babel_context_integrity-0.1.0-py3-none-any.whl
-b5105cb47a35998ae93493c573efc33bbe7977ef93360653372a0f143187d48a  babel_context_integrity-0.1.0.tar.gz
+f0e731532f2d1f681e92a1eb467f30f1568ab73761a1970be1c77e5b337c254f  babel_context_integrity-0.1.0-py3-none-any.whl
+117f9b76993e74720866ec314dc8bb2864143e56d102f2e778d4bc7fbfdcc41a  babel_context_integrity-0.1.0.tar.gz
 ```
 
 Sizes:
 ```
-babel_context_integrity-0.1.0-py3-none-any.whl          53543 bytes
-babel_context_integrity-0.1.0.tar.gz                   127864 bytes
+babel_context_integrity-0.1.0-py3-none-any.whl          53632 bytes
+babel_context_integrity-0.1.0.tar.gz                   127962 bytes
 ```
 
 ## Reproducibility
@@ -22,15 +21,7 @@ same commit, on the same Python, produces a byte-identical file.
 The **sdist is content-reproducible but not bit-reproducible**: its
 extracted tree is identical across builds, while the gzip container
 embeds a timestamp, so the outer digest changes. That is a property of
-the archive format, not of the contents, and it is recorded here rather
-than papered over.
+the archive format, not of the contents.
 
-Verify either claim yourself:
-
-```bash
-shasum -a 256 dist/*                # wheel: rebuild and compare
-tar xzf dist/*.tar.gz -C a && ...   # sdist: extract both, diff -r
-```
-
-`release/DIGESTS.txt` is deliberately excluded from the sdist: an
-archive cannot contain its own hash.
+`release/DIGESTS.txt` is excluded from the sdist: an archive cannot
+contain its own hash.

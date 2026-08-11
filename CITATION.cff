@@ -28,6 +28,7 @@ version: 0.1.0
 # `date-released` is the date this release candidate was frozen. Update it if
 # publication slips to a different day.
 date-released: "2026-08-11"
-# `repository-code`, `url` and `doi` are deliberately absent: no repository is
-# published and no DOI has been minted. Adding a field that does not resolve
-# would make this file wrong rather than incomplete. See RELEASE_CHECKLIST.md.
+repository-code: "https://github.com/boxofrecycling/babel-context-integrity"
+url: "https://github.com/boxofrecycling/babel-context-integrity"
+# `doi` is deliberately absent: no DOI has been minted. Adding one that does not
+# resolve would make this file wrong rather than incomplete.

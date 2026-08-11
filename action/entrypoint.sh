@@ -36,7 +36,7 @@ emit_summary() {
 if [ ! -f "$handoff" ]; then
     echo "babel-verify: no handoff artifact at '$handoff'" >&2
     echo "babel-verify: the producing agent is expected to write one." >&2
-    echo "babel-verify: see integrations/ for how a predecessor writes one," >&2
+    echo "babel-verify: see https://github.com/boxofrecycling/babel-context-integrity#integrations," >&2
     echo "babel-verify: or set the 'handoff' input to a different path." >&2
     exit 1
 fi

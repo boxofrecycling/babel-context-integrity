@@ -97,10 +97,23 @@ additionally runs the whole suite with outbound traffic rejected.
 
 ## How to report
 
-<!-- HUMAN: replace before publication with the real reporting channel. -->
-> **Placeholder — to be completed before release.** Preferred channel: a
-> private GitHub security advisory on the repository, once the repository
-> exists. A public issue is fine for anything that is not itself exploitable.
+**Use GitHub's private vulnerability reporting.** It is enabled on this
+repository:
+
+<https://github.com/boxofrecycling/babel-context-integrity/security/advisories/new>
+
+That opens a private advisory visible only to you and the maintainers. Use it
+for anything that could be exploited — a verification bypass above all.
+
+For anything that is **not** itself exploitable — a documentation error, a
+confusing finding message, a hardened-CI edge case — a public issue is fine and
+faster:
+
+<https://github.com/boxofrecycling/babel-context-integrity/issues>
+
+Please do not open a public issue for a verification bypass. Please also do not
+email anyone privately about one; the advisory form exists so reports are
+tracked rather than lost in a mailbox.
 
 Please include a **minimal artifact that reproduces it**. The most useful
 attachment is the output of:
@@ -112,6 +125,8 @@ babelci verify YOUR_ARTIFACT.json --json
 Expect an acknowledgement within a week. This is a small project with no
 security team, and saying so plainly is better than promising a response time
 nobody is on call for.
+
+GitHub secret scanning and push protection are enabled on the repository.
 
 ## Disclosure
 

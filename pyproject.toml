@@ -42,10 +42,12 @@ dependencies = []
 # native validator against the published JSON Schema.
 dev = ["pytest>=7.4", "jsonschema>=4.20"]
 
-# [project.urls] is deliberately absent. No repository exists yet, and metadata
-# pointing at a URL that 404s is worse than metadata with no URL at all. Add
-# Homepage / Source / Documentation in the same commit that creates the
-# repository. See RELEASE_CHECKLIST.md.
+[project.urls]
+Homepage = "https://github.com/boxofrecycling/babel-context-integrity"
+Source = "https://github.com/boxofrecycling/babel-context-integrity"
+Documentation = "https://github.com/boxofrecycling/babel-context-integrity/tree/main/docs"
+Changelog = "https://github.com/boxofrecycling/babel-context-integrity/blob/main/CHANGELOG.md"
+Issues = "https://github.com/boxofrecycling/babel-context-integrity/issues"
 
 [project.scripts]
 babelci = "babelci.cli:main"

@@ -23,7 +23,15 @@ nothing below it has been done.
 
 ## Needs a human before publication
 
-### 1. Copyright line — decide
+### 1. Copyright line — RESOLVED
+
+**Decision: keep `Copyright 2026 Scott Henry`.** Anthony Colasante is not added
+as a copyright holder on the basis of project creator credit alone. Creator
+credit remains `Scott Henry and Anthony Colasante` where truthful.
+
+<details><summary>original decision text</summary>
+
+#### Copyright line — decide
 
 `LICENSE` and `NOTICE` say **Copyright 2026 Scott Henry**. Project creator
 credit says **Scott Henry and Anthony Colasante**. These are deliberately
@@ -32,25 +40,18 @@ the evidence available supports only the narrower statement (129 of 129 commits
 in the private research repository are authored by Scott Henry; the public
 source was written for this export).
 
-- [ ] If Anthony Colasante holds a copyright interest in this code, update the
-      copyright line in **`LICENSE`**, **`NOTICE`** and **`CITATION.cff`**
-      together.
-- [ ] If not, change nothing and this box is ticked by saying so.
+- [x] Resolved: no change. `LICENSE` and `NOTICE` keep the single holder.
 
-This is the only item that touches a legal file.
+</details>
 
-### 2. Repository
+### 2. Repository — DONE
 
-- [ ] Create the repository. Suggested slug: `babel-context-integrity`.
-- [ ] Add `[project.urls]` to `pyproject.toml` (Homepage, Source,
-      Documentation) — deliberately absent until the repo exists.
-- [ ] Add `repository-code` to `CITATION.cff`.
-- [ ] Replace `PLACEHOLDER_REPOSITORY_URL` in `site/index.html`:
-      ```bash
-      sed -i '' 's|PLACEHOLDER_REPOSITORY_URL|https://github.com/OWNER/REPO|g' site/index.html
-      ```
-- [ ] Re-run `pytest` — `test_no_url_points_at_a_repository_that_does_not_exist`
-      will need its guard relaxed once the URL is real.
+- [x] Created: https://github.com/boxofrecycling/babel-context-integrity (public, account `boxofrecycling`).
+- [x] `[project.urls]` populated in `pyproject.toml`.
+- [x] `repository-code` and `url` populated in `CITATION.cff`.
+- [x] `PLACEHOLDER_REPOSITORY_URL` replaced throughout `site/index.html`.
+- [x] Private vulnerability reporting enabled; `SECURITY.md` points at the
+      advisory form rather than a personal address.
 
 ### 3. Package name
 
@@ -58,14 +59,12 @@ This is the only item that touches a legal file.
       reserved. Confirm before publishing.
 - [ ] Decide whether to reserve the name before or with the release.
 
-### 4. The GitHub Action
+### 4. The GitHub Action — DONE
 
-The action lives at `action/` and is referenced by relative path. A published
-marketplace action does not exist.
-
-- [ ] Decide whether to publish it separately or leave it vendored.
-- [ ] If published, update `docs/CI.md` and
-      `integrations/claude-code/README.md` to use the real reference.
+- [x] Referenced as `boxofrecycling/babel-context-integrity/action@v0.1.0`,
+      which is a supported `owner/repo/path@ref` form and resolves once the
+      v0.1.0 tag exists. Not published to the Marketplace; that remains
+      optional and is not required for the reference above to work.
 
 ### 5. Review
 

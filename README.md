@@ -230,7 +230,7 @@ Rules: [docs/DIFF_RULES.md](docs/DIFF_RULES.md).
 ## GitHub Action
 
 ```yaml
-- uses: ./action           # vendored; see docs/CI.md for other CI systems
+- uses: boxofrecycling/babel-context-integrity/action@v0.1.0
   with:
     handoff: .babel/handoff.json
     expect: .babel/expect.json

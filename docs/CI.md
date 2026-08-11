@@ -22,9 +22,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      # Vendor the action into your repo, or reference it by path from a
-      # checkout of this one. A published marketplace action does not exist yet.
-      - uses: ./babel-action
+      - uses: boxofrecycling/babel-context-integrity/action@v0.1.0
         with:
           handoff: .babel/handoff.json
           expect: .babel/expect.json
@@ -37,7 +35,7 @@ produces a perfectly consistent handoff; only comparing it to the previous one
 shows the reversal. Supply `against:` to run `babelci diff` as well.
 
 ```yaml
-      - uses: ./babel-action
+      - uses: boxofrecycling/babel-context-integrity/action@v0.1.0
         with:
           handoff: .babel/handoff.json
           against: .babel/handoff-previous.json
