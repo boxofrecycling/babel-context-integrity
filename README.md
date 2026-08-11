@@ -123,6 +123,12 @@ From a checkout:
 pip install -e ".[dev]"
 ```
 
+[On PyPI](https://pypi.org/project/babel-context-integrity/). Published from
+this repository with [PyPI Trusted
+Publishing](https://docs.pypi.org/trusted-publishers/) — no API token exists,
+and each release carries a signed attestation naming the workflow that built
+it.
+
 The command is `babelci` (`babel-verify` is an alias). It is not `babel` —
 that name belongs to [@babel/cli](https://babeljs.io) in JavaScript and to the
 [Babel](https://pypi.org/project/babel/) i18n library on PyPI, and shadowing

@@ -1,6 +1,16 @@
 # Changelog
 
-## 0.1.0 — unreleased
+## 0.1.0 — 2026-08-11
+
+Published to [PyPI](https://pypi.org/project/babel-context-integrity/0.1.0/)
+via Trusted Publishing from `.github/workflows/release.yml`. No API token
+exists for this project; the upload was authorised by a short-lived OIDC
+token and carries signed attestations naming the workflow that produced it.
+
+The published artifacts are byte-identical to those attached to the GitHub
+`v0.1.0` release and to the digests recorded in `release/DIGESTS.txt` at that
+tag. The release workflow requires that three-way equality before uploading
+anything.
 
 First public release candidate. Nothing has been published to any registry.
 
