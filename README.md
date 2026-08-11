@@ -323,6 +323,13 @@ Every agent is a deterministic fixture. A controlled real-model evaluation is
 the proposed next step and is [designed but not
 authorised](docs/ROADMAP_REAL_MODEL.md).
 
+## Provenance of this repository
+
+This is a sanitised export from a private research repository. What was scanned
+before publication, what was removed, and what is deliberately excluded are all
+recorded in [docs/DISCLOSURE_AUDIT.md](docs/DISCLOSURE_AUDIT.md). Every public
+claim reproduces here without the private repository.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). The short version: new verification
