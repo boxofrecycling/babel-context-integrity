@@ -1,0 +1,180 @@
+{
+  "artifacts": [
+    {
+      "digest": "sha256:33f684f51a77ef9f7d4bbc20b20b877dfeac23daf6d6b1e6507e996a0505250b",
+      "path": "schema/babel-handoff-0.1.schema.json",
+      "role": "specification"
+    }
+  ],
+  "authorities": [
+    {
+      "authority_id": "babel-release-preparation",
+      "encoding": "babel/authority-a/document-tree/0.1",
+      "world_digest": "sha256:69169c051727567fce19a4692bfc5a4e021e478cae9b016439436dfa14678475"
+    }
+  ],
+  "babel_handoff": "0.1",
+  "checkpoint": {
+    "checkpoint_id": "cp-rc-1",
+    "state_digest": "sha256:572688ce93b2211f518ffe4f17404c1c0b26daff9c5d421f39ac958c0d9b9dfe"
+  },
+  "consumer": {
+    "agent": "reviewer",
+    "role": "human"
+  },
+  "decisions": [
+    {
+      "choice": "Distribution is named babel-context-integrity; the console script is babelci, not babel.",
+      "decision_id": "D1",
+      "provenance": "pyproject.toml",
+      "rationale": "babel on PyPI is the i18n library and babel in npm belongs to @babel/cli."
+    },
+    {
+      "choice": "Apache-2.0.",
+      "decision_id": "D2",
+      "provenance": "LICENSE",
+      "rationale": "Zero runtime dependencies means no compatibility constraint; the patent grant matters for a contract intended for adoption."
+    },
+    {
+      "choice": "Open core: the verifier, contract, lab, action and integrations stay open source permanently.",
+      "decision_id": "D3",
+      "provenance": "docs/COMMERCIAL_STRATEGY.md",
+      "rationale": "The paid boundary is aggregation across runs and repositories, not the checker."
+    },
+    {
+      "choice": "No real-model evaluation is run or authorised for v0.1.",
+      "decision_id": "D4",
+      "provenance": "docs/ROADMAP_REAL_MODEL.md",
+      "rationale": "The private programme's decision is SOFTWARE_FRONTIER_CLOSED_AND_PARKED with NO AUTHORIZATION; publishing does not change it."
+    }
+  ],
+  "handoff_id": "bci-0.1.0-release-candidate",
+  "objects": [
+    {
+      "kind": "fact",
+      "object_id": "contract.version",
+      "provenance": "schema/babel-handoff-0.1.schema.json",
+      "required": true,
+      "value": "0.1"
+    },
+    {
+      "kind": "metric",
+      "object_id": "lab.cases",
+      "provenance": "src/babelci/lab/cases.py",
+      "required": true,
+      "value": 15
+    },
+    {
+      "kind": "metric",
+      "object_id": "verification.layers",
+      "provenance": "src/babelci/contract.py",
+      "required": true,
+      "value": 8
+    },
+    {
+      "kind": "metric",
+      "object_id": "runtime.dependencies",
+      "provenance": "pyproject.toml",
+      "required": true,
+      "value": 0
+    },
+    {
+      "kind": "fact",
+      "object_id": "license",
+      "provenance": "LICENSE",
+      "required": true,
+      "value": "Apache-2.0"
+    }
+  ],
+  "producer": {
+    "agent": "release-preparation",
+    "role": "implementer",
+    "run_id": "rc-1"
+  },
+  "provenance": {
+    "authority_root": "babel-context-integrity@v0.1.0",
+    "edges": [
+      [
+        "schema/babel-handoff-0.1.schema.json",
+        "babel-context-integrity@v0.1.0"
+      ],
+      [
+        "src/babelci/lab/cases.py",
+        "babel-context-integrity@v0.1.0"
+      ],
+      [
+        "src/babelci/contract.py",
+        "babel-context-integrity@v0.1.0"
+      ],
+      [
+        "pyproject.toml",
+        "babel-context-integrity@v0.1.0"
+      ],
+      [
+        "LICENSE",
+        "babel-context-integrity@v0.1.0"
+      ],
+      [
+        "docs/COMMERCIAL_STRATEGY.md",
+        "babel-context-integrity@v0.1.0"
+      ],
+      [
+        "docs/ROADMAP_REAL_MODEL.md",
+        "babel-context-integrity@v0.1.0"
+      ]
+    ]
+  },
+  "retained_constraints": [
+    {
+      "binding": "MUST",
+      "constraint_id": "R1",
+      "provenance": "babel-context-integrity@v0.1.0",
+      "statement": "No public claim may be stronger than what the public lab reproduces."
+    },
+    {
+      "binding": "MUST",
+      "constraint_id": "R2",
+      "provenance": "babel-context-integrity@v0.1.0",
+      "statement": "Structural integrity, semantic equivalence, provenance, authority agreement and external truth are reported separately and never collapsed."
+    },
+    {
+      "binding": "MUST",
+      "constraint_id": "R3",
+      "provenance": "babel-context-integrity@v0.1.0",
+      "statement": "The package contacts no network and no model, and this is enforced by tests rather than by documentation."
+    },
+    {
+      "binding": "MUST",
+      "constraint_id": "R4",
+      "provenance": "babel-context-integrity@v0.1.0",
+      "statement": "No frozen private research authority is modified by anything in this repository."
+    },
+    {
+      "binding": "SHOULD",
+      "constraint_id": "R5",
+      "provenance": "babel-context-integrity@v0.1.0",
+      "statement": "Every lab case names the private research result it derives from."
+    }
+  ],
+  "summary": {
+    "commitment": "sha256:41545ea4108d02a512b55cf4eb00ffae5aa84518bb92f2bc20e72a2f2b1c6e49",
+    "text": "Babel Context Integrity v0.1 release candidate. The verifier reports eight layers separately, the lab reproduces fifteen failure classes, and the package has no runtime dependencies and contacts nothing. Two decisions remain with a human: the copyright line, and whether to publish at all. No private frozen authority was modified and no real-model evaluation was run or authorised."
+  },
+  "task": {
+    "family": "release",
+    "task_id": "babel/public-release-v0.1",
+    "title": "Prepare Babel Context Integrity v0.1 for public release"
+  },
+  "unresolved": [
+    {
+      "blocking": true,
+      "issue_id": "U1",
+      "statement": "Whether the LICENSE copyright line should name one holder or two is a decision for the copyright holders and has been left unmade."
+    },
+    {
+      "blocking": true,
+      "issue_id": "U2",
+      "statement": "The public repository slug and any package registration are not reserved; nothing has been published."
+    }
+  ]
+}

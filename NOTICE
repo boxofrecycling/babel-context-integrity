@@ -1,0 +1,57 @@
+Babel Context Integrity
+Copyright 2026 Scott Henry
+
+Licensed under the Apache License, Version 2.0. See LICENSE.
+
+--------------------------------------------------------------------------
+ATTRIBUTION: two different things, kept separate on purpose
+--------------------------------------------------------------------------
+
+Project creator credit
+    Scott Henry and Anthony Colasante
+
+    This is the project-level creator credit for Babel Context Integrity and
+    the research programme it comes from. It appears in README.md and
+    CITATION.cff.
+
+Copyright holder for the code in this repository
+    Scott Henry
+
+    This is a narrower, verifiable statement. Every commit in the private
+    research repository this export derives from is authored by Scott Henry
+    (129 of 129 commits across all branches), and the source in this public
+    repository was written for this export.
+
+    Creator credit and copyright ownership are not automatically the same
+    thing, so this file records them separately rather than assuming.
+
+    >> OPEN DECISION: if Anthony Colasante holds a copyright interest in this
+    >> code, the copyright line in LICENSE, this file, and CITATION.cff should
+    >> be updated to name both holders before publication. That is a decision
+    >> for the copyright holders, not for a tool, and it has deliberately been
+    >> left unmade rather than guessed.
+
+Historical contribution records
+    Git authorship, commit history, tag provenance and experimental execution
+    history in the private research repository are unmodified and were not
+    rewritten for this export. Nothing in this repository restates them.
+
+--------------------------------------------------------------------------
+THIRD-PARTY CONTENT
+--------------------------------------------------------------------------
+
+This package has no runtime dependencies.
+
+Optional development dependencies, used only to run the test suite and not
+distributed with the wheel:
+
+    pytest       MIT License
+    jsonschema   MIT License
+
+Both are compatible with Apache-2.0.
+
+No vendor's proprietary prompt text, model output, documentation or branding is
+included in this repository. References to Claude Code, Codex or any other
+product in integrations/ and docs/ are nominative references to publicly known
+tool names, describing interoperability. No affiliation or endorsement is
+claimed or implied.

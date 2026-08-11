@@ -1,0 +1,63 @@
+{
+  "babel_handoff": "0.1",
+  "handoff_id": "CHANGE-ME-unique-id",
+
+  "task": {
+    "task_id": "CHANGE-ME/short-slug",
+    "title": "One line: what is the work?"
+  },
+
+  "producer": { "agent": "your-name", "role": "human" },
+  "consumer": { "agent": "the-agent-you-are-briefing" },
+
+  "checkpoint": { "checkpoint_id": "cp-01", "state_digest": "" },
+
+  "objects": [
+    {
+      "object_id": "some.fact",
+      "kind": "fact",
+      "value": "what you believe is true",
+      "required": true,
+      "provenance": "how-you-know-it"
+    }
+  ],
+
+  "retained_constraints": [
+    {
+      "constraint_id": "C1",
+      "binding": "MUST",
+      "statement": "The thing that must not break. Be specific enough that a stranger could check it."
+    },
+    {
+      "constraint_id": "C2",
+      "binding": "SHOULD",
+      "statement": "A preference, not a rule."
+    }
+  ],
+
+  "decisions": [
+    {
+      "decision_id": "D1",
+      "choice": "Something already settled.",
+      "rationale": "Why, so nobody relitigates it in three days."
+    }
+  ],
+
+  "unresolved": [
+    {
+      "issue_id": "U1",
+      "statement": "Something you genuinely do not know yet.",
+      "blocking": false
+    }
+  ],
+
+  "provenance": {
+    "authority_root": "repo@COMMIT-OR-TICKET",
+    "edges": [["how-you-know-it", "repo@COMMIT-OR-TICKET"]]
+  },
+
+  "summary": {
+    "text": "Write this LAST, after the fields above. If the prose says something the fields do not, one of them is wrong.",
+    "commitment": ""
+  }
+}

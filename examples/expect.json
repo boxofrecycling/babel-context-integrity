@@ -1,0 +1,23 @@
+{
+  "authority_root": "repo@a1b2c3d4",
+  "babel_expectation": "0.1",
+  "required_constraints": [
+    {
+      "constraint_id": "C1",
+      "statement_commitment": "sha256:827ae24a8d31c9fb6a012a8ac0f400a22a3fedbb4493a2235609738c73334122"
+    },
+    {
+      "constraint_id": "C2",
+      "statement_commitment": "sha256:5fecec54e13e01fb919327001686d039d93d3e6b4d63fc2fcb7c03bf1f2dac4a"
+    }
+  ],
+  "required_objects": [
+    "auth.provider",
+    "legacy.sessions",
+    "test.baseline"
+  ],
+  "required_unresolved": [
+    "U1"
+  ],
+  "task_id": "PR-4412/migrate-auth-to-oidc"
+}

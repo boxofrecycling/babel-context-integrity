@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Babel Context Integrity</title>
+<meta name="description" content="Verify what survives when one AI agent hands work to the next. Open-source, local, deterministic handoff verification.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='7' cy='16' r='3.5' fill='%23888'/%3E%3Cpath d='M11 16h10' stroke='%23888' stroke-width='2' stroke-dasharray='2 2'/%3E%3Ccircle cx='25' cy='16' r='3.5' fill='none' stroke='%23888' stroke-width='2'/%3E%3C/svg%3E">
+<style>
+:root {
+  --bg: #fbfbfa;
+  --panel: #ffffff;
+  --ink: #16181d;
+  --muted: #5c6270;
+  --faint: #8b909c;
+  --rule: #e3e4e8;
+  --term-bg: #14161a;
+  --term-ink: #d6d9df;
+  --term-dim: #6f7681;
+  --ok: #1a7f4b;
+  --bad: #b4331f;
+  --warn: #96690d;
+  --accent: #16181d;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1013;
+    --panel: #16191e;
+    --ink: #e6e8ec;
+    --muted: #9aa0ac;
+    --faint: #6b717d;
+    --rule: #262a31;
+    --term-bg: #090a0c;
+    --term-ink: #d6d9df;
+    --term-dim: #6f7681;
+    --ok: #4ec27f;
+    --bad: #ef6d55;
+    --warn: #d8a93c;
+    --accent: #e6e8ec;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1013;
+  --panel: #16191e;
+  --ink: #e6e8ec;
+  --muted: #9aa0ac;
+  --faint: #6b717d;
+  --rule: #262a31;
+  --term-bg: #090a0c;
+  --term-ink: #d6d9df;
+  --term-dim: #6f7681;
+  --ok: #4ec27f;
+  --bad: #ef6d55;
+  --warn: #d8a93c;
+  --accent: #e6e8ec;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+.wrap { max-width: 47rem; margin: 0 auto; padding: 0 1.5rem; }
+a { color: var(--ink); text-decoration-color: var(--faint); text-underline-offset: 3px; }
+a:hover { text-decoration-color: var(--ink); }
+code, pre { font-family: var(--mono); }
+
+/* ---- masthead ------------------------------------------------------- */
+header { padding: 4.5rem 0 0; }
+.mark { display: flex; align-items: center; gap: .7rem; margin-bottom: 2.75rem; }
+.mark svg { flex: none; }
+.mark .name {
+  font-family: var(--mono); font-size: .82rem; letter-spacing: .13em;
+  text-transform: uppercase; color: var(--muted);
+}
+h1 {
+  font-size: clamp(1.9rem, 5.2vw, 2.9rem);
+  line-height: 1.14; letter-spacing: -.022em; font-weight: 620;
+  margin: 0 0 1.1rem;
+}
+.lede { font-size: 1.12rem; color: var(--muted); margin: 0 0 .6rem; max-width: 34rem; }
+.lede strong { color: var(--ink); font-weight: 560; }
+
+.cta { display: flex; flex-wrap: wrap; gap: .6rem; margin: 2.2rem 0 0; }
+.btn {
+  font-family: var(--mono); font-size: .86rem; padding: .58rem 1rem;
+  border: 1px solid var(--rule); border-radius: 6px; background: var(--panel);
+  text-decoration: none; color: var(--ink);
+}
+.btn.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+.btn:hover { border-color: var(--faint); }
+
+/* ---- terminal ------------------------------------------------------- */
+.term {
+  background: var(--term-bg); color: var(--term-ink);
+  border-radius: 8px; padding: 1.15rem 1.25rem; margin: 2.2rem 0;
+  overflow-x: auto; font-family: var(--mono);
+  font-size: .82rem; line-height: 1.62;
+  border: 1px solid var(--rule);
+}
+.term pre { margin: 0; white-space: pre; }
+.term .p { color: var(--term-dim); }
+.ok { color: var(--ok); } .bad { color: var(--bad); } .warn { color: var(--warn); }
+.dim { color: var(--term-dim); }
+
+/* ---- sections ------------------------------------------------------- */
+section { padding: 3.2rem 0; border-top: 1px solid var(--rule); margin-top: 3.2rem; }
+h2 {
+  font-size: .78rem; font-family: var(--mono); letter-spacing: .13em;
+  text-transform: uppercase; color: var(--faint); font-weight: 500;
+  margin: 0 0 1.4rem;
+}
+h3 { font-size: 1.05rem; font-weight: 590; margin: 0 0 .4rem; letter-spacing: -.01em; }
+p { margin: 0 0 1rem; }
+.muted { color: var(--muted); }
+
+.grid { display: grid; gap: 1.6rem; grid-template-columns: 1fr; }
+@media (min-width: 40rem) { .grid.two { grid-template-columns: 1fr 1fr; } }
+
+ul.plain { list-style: none; padding: 0; margin: 0; }
+ul.plain li { padding: .5rem 0; border-bottom: 1px solid var(--rule); color: var(--muted); font-size: .95rem; }
+ul.plain li:last-child { border-bottom: 0; }
+ul.plain b { color: var(--ink); font-weight: 560; }
+
+.pull {
+  font-size: 1.22rem; line-height: 1.45; letter-spacing: -.012em;
+  border-left: 2px solid var(--rule); padding-left: 1.15rem; margin: 0 0 1.2rem;
+}
+
+table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+.scroll { overflow-x: auto; }
+th, td { text-align: left; padding: .5rem .7rem .5rem 0; border-bottom: 1px solid var(--rule); }
+th { font-weight: 560; font-size: .76rem; text-transform: uppercase; letter-spacing: .07em; color: var(--faint); }
+td.mono, th.mono { font-family: var(--mono); font-size: .81rem; }
+
+/* ---- waitlist ------------------------------------------------------- */
+.card { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 1.5rem; }
+form { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1rem 0 .6rem; }
+input[type=email] {
+  flex: 1 1 15rem; padding: .58rem .8rem; font-family: var(--mono); font-size: .86rem;
+  border: 1px solid var(--rule); border-radius: 6px; background: var(--bg); color: var(--ink);
+}
+input[type=email]:focus { outline: 2px solid var(--faint); outline-offset: 1px; }
+button {
+  font-family: var(--mono); font-size: .86rem; padding: .58rem 1rem; cursor: pointer;
+  border: 1px solid var(--accent); border-radius: 6px; background: var(--accent); color: var(--bg);
+}
+.note { font-size: .82rem; color: var(--faint); margin: 0; }
+
+footer { padding: 3rem 0 4.5rem; border-top: 1px solid var(--rule); margin-top: 3.2rem;
+         color: var(--faint); font-size: .86rem; }
+footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<header>
+  <div class="mark">
+    <svg width="30" height="18" viewBox="0 0 32 18" aria-hidden="true">
+      <circle cx="5" cy="9" r="3.6" fill="currentColor" opacity=".55"/>
+      <path d="M10 9h11" stroke="currentColor" stroke-width="1.8" stroke-dasharray="2.4 2.4" opacity=".4"/>
+      <circle cx="26" cy="9" r="3.6" fill="none" stroke="currentColor" stroke-width="1.8" opacity=".55"/>
+    </svg>
+    <span class="name">Babel Context Integrity</span>
+  </div>
+
+  <h1>Verify what survives when one AI&nbsp;agent hands work to the next.</h1>
+
+  <p class="lede">Git checks your code. <strong>Babel checks what your next agent
+  thinks happened.</strong></p>
+
+  <p class="lede">Your agent runs out of context and hands off. The successor
+  inherits a summary — and the constraint that said <em>don't drop the legacy
+  table yet</em> is no longer in it. Nothing notices.</p>
+
+  <div class="cta">
+    <a class="btn primary" href="#install">Install</a>
+    <a class="btn" href="https://github.com/babel-context-integrity/babel-context-integrity">GitHub</a>
+    <a class="btn" href="#waitlist">Hosted beta waitlist</a>
+  </div>
+</header>
+
+<div class="term" role="img" aria-label="Terminal showing babelci verify failing on a dropped constraint">
+<pre><span class="p">$</span> babelci verify .babel/handoff.json --expect .babel/expect.json
+
+<span class="bad">FAIL</span>  .babel/handoff.json
+  structure ............. <span class="ok">verified</span>   contract 0.1, 5 objects
+  identity .............. <span class="ok">verified</span>   agent-b -&gt; agent-c
+  checkpoint ............ <span class="ok">verified</span>   cp-4412-02
+  provenance ............ <span class="ok">verified</span>   5 objects to repo@a1b2c3d4
+  retained constraints .. <span class="bad">FAILED</span>
+  conflicts ............. <span class="ok">verified</span>   none
+  authority agreement ... <span class="ok">verified</span>   3 encodings agree
+  external truth ........ <span class="warn">not established</span>
+
+  <span class="bad">RETAINED_CONSTRAINT_MISSING</span>
+    constraint 'C1' was required to survive this handoff and is absent
+    <span class="dim">expected: C1</span>
+    <span class="dim">received: None</span></pre>
+</div>
+
+<p class="muted">Exit code 1. Your CI check goes red — before a human reads a
+summary that no longer matches the code.</p>
+
+<!-- ------------------------------------------------------------------ -->
+<section>
+<h2>The part most tools skip</h2>
+
+<p class="pull">Look at the last line. <em>External truth: not
+established.</em></p>
+
+<p>Everything above it is <strong>internal consistency</strong>. Babel
+recomputed the commitments, walked the provenance graph, and encoded the
+artifact twice with two independent encoders that agreed. That is a real
+result. It is not the same as the story being true.</p>
+
+<p>Here is a handoff from an agent that scanned the wrong branch. Every fact in
+it is wrong. Every internal check passes:</p>
+
+<div class="term" role="img" aria-label="Terminal showing seven layers verified and external truth failed">
+<pre><span class="p">$</span> babelci verify examples/common-mode-handoff.json
+
+<span class="bad">FAIL</span>  examples/common-mode-handoff.json
+  structure ............. <span class="ok">verified</span>
+  identity .............. <span class="ok">verified</span>
+  checkpoint ............ <span class="ok">verified</span>
+  provenance ............ <span class="ok">verified</span>
+  retained constraints .. <span class="ok">verified</span>
+  conflicts ............. <span class="ok">verified</span>
+  authority agreement ... <span class="ok">verified</span>
+  external truth ........ <span class="bad">FAILED</span>
+
+  <span class="bad">EXTERNAL_RECEIPT_REJECTED</span>
+    repository working tree at repo@a1b2c3d4 rejected this world:
+    auth.provider is okta-oidc in the tree, not auth0-oidc;
+    legacy.sessions counted 1843 rows, not 12</pre>
+</div>
+
+<p>Two encoders sharing no code agree completely — because they are both
+reading the same false artifact. Only a receipt issued <em>outside</em> the
+artifact catches it, and that receipt is now the thing you have to trust.</p>
+
+<p class="pull"><strong>Agreement is not truth.</strong> Babel is built to show
+you where one stops and the other begins, instead of collapsing them into a
+green tick.</p>
+</section>
+
+<!-- ------------------------------------------------------------------ -->
+<section id="install">
+<h2>Install</h2>
+
+<div class="term">
+<pre><span class="p">$</span> pip install babel-context-integrity
+<span class="p">$</span> babelci demo</pre>
+</div>
+
+<p class="muted">Python 3.10+. <strong>Zero runtime dependencies. Zero network
+access. No telemetry.</strong> Enforced by a test that parses every module's
+imports, and a CI job that runs the whole suite with outbound traffic
+firewalled off.</p>
+
+<div class="grid two">
+  <div>
+    <h3>Runs in CI</h3>
+    <p class="muted">A GitHub Action wrapping the same CLI. Failures block the
+    check. No cloud account, no token, no service.</p>
+  </div>
+  <div>
+    <h3>Runs offline</h3>
+    <p class="muted">Works under <code>--network=none</code>. Nothing is sent
+    anywhere, because there is no code in the package that could send it.</p>
+  </div>
+</div>
+</section>
+
+<!-- ------------------------------------------------------------------ -->
+<section>
+<h2>What it checks</h2>
+
+<div class="scroll">
+<table>
+<thead><tr><th class="mono">layer</th><th>establishes</th></tr></thead>
+<tbody>
+<tr><td class="mono">structure</td><td>the artifact matches the declared contract version</td></tr>
+<tr><td class="mono">identity</td><td>it concerns the work you expected</td></tr>
+<tr><td class="mono">checkpoint</td><td>the commitment recomputes from the state it carries</td></tr>
+<tr><td class="mono">provenance</td><td>every assertion reaches the authority root</td></tr>
+<tr><td class="mono">constraints</td><td>what had to survive, survived unmodified</td></tr>
+<tr><td class="mono">conflicts</td><td>no unresolved contradiction about one object</td></tr>
+<tr><td class="mono">authorities</td><td>two independent encoders read it the same way</td></tr>
+<tr><td class="mono">external truth</td><td>something outside the artifact accepted it</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="muted" style="margin-top:1.2rem">Reported separately, never averaged.
+Each layer ends in <span class="ok">verified</span>,
+<span class="bad">FAILED</span>, or
+<span class="warn">not&nbsp;established</span> — because a check that could not
+run is not a check that passed.</p>
+</section>
+
+<!-- ------------------------------------------------------------------ -->
+<section>
+<h2>The lab</h2>
+
+<p><code>babelci lab</code> runs 15 failure classes, each generated from one
+clean handoff by <strong>one named mutation</strong> — so the difference
+between pass and fail is always a single edit you can read.</p>
+
+<ul class="plain">
+  <li><b>constraint-dropped</b> — a MUST constraint stops being carried</li>
+  <li><b>constraint-softened</b> — it keeps its id and changes meaning</li>
+  <li><b>decision-reversed</b> — verify can't see it; diff refuses it</li>
+  <li><b>summary-drift</b> — the prose no longer matches the state</li>
+  <li><b>provenance-break</b> — a fact loses its chain to the repository</li>
+  <li><b>alias-collapse</b> — compaction makes two names mean one thing</li>
+  <li><b>authority-disagreement</b> — two encoders read it differently</li>
+  <li><b>compression-loss</b> — compaction drops a required object</li>
+  <li><b>common-mode</b> — everything agrees, everything is wrong</li>
+</ul>
+
+<p class="muted" style="margin-top:1.4rem">Integrity machinery costs
+<strong>7,064 of 21,848 bits (32.3%)</strong> of the example artifact. Measured
+by the lab, not estimated.</p>
+</section>
+
+<!-- ------------------------------------------------------------------ -->
+<section>
+<h2>Limits</h2>
+
+<p>Read these before believing anything above.</p>
+
+<ul class="plain">
+  <li><b>Babel does not check whether text is true.</b> It checks whether a structured artifact satisfies a declared contract.</li>
+  <li><b>It does not detect hallucination.</b> A hallucinated fact with a plausible provenance label and a correct commitment verifies.</li>
+  <li><b>Encoder agreement is not truth.</b> That is the common-mode case — a limitation, not a feature.</li>
+  <li><b>The external receipt is a trust root, not a solution.</b> Babel moves trust somewhere you can name and audit. It does not remove it.</li>
+  <li><b>No language model was involved in this research.</b> The lab agents are deterministic fixtures. A real-model evaluation is designed and has not been run.</li>
+  <li><b>Structured agent handoffs are not new.</b> The related-work review names CLAN and ~20 other projects before describing what differs here.</li>
+</ul>
+</section>
+
+<!-- ------------------------------------------------------------------ -->
+<section id="waitlist">
+<h2>For teams — later</h2>
+
+<div class="card">
+  <h3>Hosted beta</h3>
+  <p class="muted">The CLI, the contract, the lab and the CI action are open
+  source under Apache-2.0 and stay that way. What a local check cannot do is
+  answer <em>"when did constraint C1 stop being carried, and in which PR?"</em>
+  — that needs history across runs and repositories.</p>
+
+  <p class="muted">Handoff history, signed team receipts, policy as code and
+  cross-repository visibility are <strong>not built yet</strong>. If that is
+  useful to you, say so and it gets prioritised.</p>
+
+  <form onsubmit="event.preventDefault(); document.getElementById('wl-msg').hidden = false;">
+    <input type="email" placeholder="you@company.com" aria-label="Email address" required>
+    <button type="submit">Notify me</button>
+  </form>
+  <p class="note" id="wl-msg" hidden>This form is not connected to anything
+  yet — nothing was submitted or stored.</p>
+  <p class="note">No backend is wired up. Nothing is collected.</p>
+</div>
+</section>
+
+<footer>
+  <p>Open source under Apache-2.0 ·
+     <a href="https://github.com/babel-context-integrity/babel-context-integrity">GitHub</a> ·
+     <a href="https://github.com/babel-context-integrity/babel-context-integrity/blob/main/docs/LIMITS.md">Limits</a> ·
+     <a href="https://github.com/babel-context-integrity/babel-context-integrity/blob/main/paper/README.md">Technical report</a></p>
+  <p>Created by Scott Henry and Anthony Colasante.</p>
+  <p style="margin-top:1.4rem; font-size:.8rem">No vendor named in the
+  documentation has endorsed, reviewed, or is affiliated with this project.</p>
+</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,221 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://babel-context-integrity.dev/schema/babel-handoff-0.1.schema.json",
+  "title": "Babel Handoff Contract v0.1",
+  "description": "A structured record of what one agent claims happened, what must survive into the next agent, and what evidence binds those claims. Structural validity is necessary and never sufficient; see docs/HANDOFF_CONTRACT.md.",
+  "type": "object",
+  "required": [
+    "babel_handoff",
+    "handoff_id",
+    "task",
+    "producer",
+    "checkpoint",
+    "objects",
+    "provenance"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "babel_handoff": {
+      "description": "Contract version this artifact declares conformance to.",
+      "const": "0.1"
+    },
+    "handoff_id": {
+      "description": "Opaque identifier, unique within the producing system.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "task": {
+      "description": "What the work is. Identity is compared, never interpreted.",
+      "type": "object",
+      "required": ["task_id"],
+      "additionalProperties": false,
+      "properties": {
+        "task_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "title": { "type": "string", "maxLength": 1024 },
+        "family": { "type": "string", "maxLength": 128 }
+      }
+    },
+    "producer": { "$ref": "#/$defs/party" },
+    "consumer": { "$ref": "#/$defs/party" },
+    "checkpoint": {
+      "description": "Commitment binding this artifact to a point in the work.",
+      "type": "object",
+      "required": ["checkpoint_id", "state_digest"],
+      "additionalProperties": false,
+      "properties": {
+        "checkpoint_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "state_digest": { "$ref": "#/$defs/digest" },
+        "parent_checkpoint_id": { "type": "string", "maxLength": 256 }
+      }
+    },
+    "objects": {
+      "description": "Typed assertions the producer is handing forward.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/object" }
+    },
+    "retained_constraints": {
+      "description": "Statements the producer asserts must survive this handoff unchanged.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/constraint" }
+    },
+    "decisions": {
+      "description": "Choices already made, which the successor inherits rather than reopens.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/decision" }
+    },
+    "unresolved": {
+      "description": "Known-open questions. Silence here is a claim that nothing is open.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/unresolved" }
+    },
+    "artifacts": {
+      "description": "Files or outputs produced, bound by digest.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/artifact" }
+    },
+    "provenance": {
+      "description": "Where the asserted objects came from.",
+      "type": "object",
+      "required": ["authority_root", "edges"],
+      "additionalProperties": false,
+      "properties": {
+        "authority_root": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "prefixItems": [
+              { "type": "string", "minLength": 1 },
+              { "type": "string", "minLength": 1 }
+            ],
+            "minItems": 2,
+            "maxItems": 2
+          }
+        }
+      }
+    },
+    "aliases": {
+      "description": "Short names introduced by compaction. Must be a bijection onto object ids.",
+      "type": "array",
+      "items": {
+        "type": "array",
+        "prefixItems": [
+          { "type": "string", "minLength": 1 },
+          { "type": "string", "minLength": 1 }
+        ],
+        "minItems": 2,
+        "maxItems": 2
+      }
+    },
+    "summary": {
+      "description": "Prose the successor will actually read, bound to the structured world.",
+      "type": "object",
+      "required": ["text", "commitment"],
+      "additionalProperties": false,
+      "properties": {
+        "text": { "type": "string", "maxLength": 65536 },
+        "commitment": { "$ref": "#/$defs/digest" }
+      }
+    },
+    "authorities": {
+      "description": "Independently computed commitments over the same semantic world. Two or more distinct encodings are required for the authority-agreement layer to conclude anything.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["authority_id", "encoding", "world_digest"],
+        "additionalProperties": false,
+        "properties": {
+          "authority_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+          "encoding": { "type": "string", "minLength": 1, "maxLength": 256 },
+          "world_digest": { "$ref": "#/$defs/digest" }
+        }
+      }
+    },
+    "external_receipt": {
+      "description": "An acceptance or rejection produced by something that is not this artifact and not this verifier. This is the only field that can speak to truth rather than integrity, and it is only as trustworthy as whatever issued it.",
+      "type": "object",
+      "required": ["receipt_id", "trust_root", "accepted", "world_digest"],
+      "additionalProperties": false,
+      "properties": {
+        "receipt_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "trust_root": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "accepted": { "type": "boolean" },
+        "world_digest": { "$ref": "#/$defs/digest" },
+        "findings": { "type": "array", "items": { "type": "string", "maxLength": 256 } }
+      }
+    }
+  },
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "party": {
+      "type": "object",
+      "required": ["agent"],
+      "additionalProperties": false,
+      "properties": {
+        "agent": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "role": { "type": "string", "maxLength": 128 },
+        "run_id": { "type": "string", "maxLength": 256 }
+      }
+    },
+    "object": {
+      "type": "object",
+      "required": ["object_id", "kind", "value", "provenance"],
+      "additionalProperties": false,
+      "properties": {
+        "object_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "kind": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "value": {},
+        "required": { "type": "boolean", "default": false },
+        "provenance": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "supersedes": { "type": "string", "maxLength": 256 }
+      }
+    },
+    "constraint": {
+      "type": "object",
+      "required": ["constraint_id", "statement", "binding"],
+      "additionalProperties": false,
+      "properties": {
+        "constraint_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "statement": { "type": "string", "minLength": 1, "maxLength": 4096 },
+        "binding": { "enum": ["MUST", "SHOULD"] },
+        "provenance": { "type": "string", "maxLength": 256 }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "required": ["decision_id", "choice"],
+      "additionalProperties": false,
+      "properties": {
+        "decision_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "choice": { "type": "string", "minLength": 1, "maxLength": 4096 },
+        "rationale": { "type": "string", "maxLength": 8192 },
+        "supersedes": { "type": "string", "maxLength": 256 },
+        "provenance": { "type": "string", "maxLength": 256 }
+      }
+    },
+    "unresolved": {
+      "type": "object",
+      "required": ["issue_id", "statement"],
+      "additionalProperties": false,
+      "properties": {
+        "issue_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "statement": { "type": "string", "minLength": 1, "maxLength": 4096 },
+        "blocking": { "type": "boolean", "default": false }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "required": ["path", "digest"],
+      "additionalProperties": false,
+      "properties": {
+        "path": { "type": "string", "minLength": 1, "maxLength": 4096 },
+        "digest": { "$ref": "#/$defs/digest" },
+        "role": { "type": "string", "maxLength": 128 }
+      }
+    }
+  }
+}

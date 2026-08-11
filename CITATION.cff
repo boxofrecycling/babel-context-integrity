@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+title: "Babel Context Integrity"
+message: "If you use this software or the handoff contract, please cite it."
+type: software
+authors:
+  - family-names: Henry
+    given-names: Scott
+  - family-names: Colasante
+    given-names: Anthony
+abstract: >-
+  A deterministic, offline verifier and machine-readable contract for agent
+  handoff artifacts. Babel checks whether the structured record one agent hands
+  to the next still satisfies a declared contract: whether commitments
+  recompute, whether provenance reaches its authority root, whether constraints
+  marked as surviving actually survived, and whether independently computed
+  encodings agree. It deliberately separates structural integrity, semantic
+  equivalence under tested fixtures, provenance, authority agreement, and
+  external truth, and never collapses them into a single verdict.
+keywords:
+  - AI agents
+  - agent handoff
+  - context integrity
+  - provenance
+  - verification
+  - continuous integration
+license: Apache-2.0
+version: 0.1.0
+date-released: "2026-08-11"
+repository-code: "https://github.com/babel-context-integrity/babel-context-integrity"

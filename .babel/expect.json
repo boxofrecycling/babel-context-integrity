@@ -1,0 +1,40 @@
+{
+  "authority_root": "babel-context-integrity@v0.1.0",
+  "babel_expectation": "0.1",
+  "required_constraints": [
+    {
+      "constraint_id": "R1",
+      "statement_commitment": "sha256:5d813ffe73947807c32e60cc7aacc99e416964f8e80136173e5af870115ee45c"
+    },
+    {
+      "constraint_id": "R2",
+      "statement_commitment": "sha256:3e84a381cc0cf5fe0b48f7b8efd347750da25ed8212e82f3ed20a875a05f8881"
+    },
+    {
+      "constraint_id": "R3",
+      "statement_commitment": "sha256:f667ce8a9c75a2541564d948cfc75a356f10b5aed7badebe2e8e7c24b942505f"
+    },
+    {
+      "constraint_id": "R4",
+      "statement_commitment": "sha256:80fbc68b43c0686c2b4a8b4985896fc67c31049c0f2669c4ca64c743461db41d"
+    }
+  ],
+  "required_decisions": [
+    "D1",
+    "D2",
+    "D3",
+    "D4"
+  ],
+  "required_objects": [
+    "contract.version",
+    "lab.cases",
+    "license",
+    "runtime.dependencies",
+    "verification.layers"
+  ],
+  "required_unresolved": [
+    "U1",
+    "U2"
+  ],
+  "task_id": "babel/public-release-v0.1"
+}

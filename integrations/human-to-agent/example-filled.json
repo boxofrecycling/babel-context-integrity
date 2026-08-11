@@ -1,0 +1,83 @@
+{
+  "babel_handoff": "0.1",
+  "checkpoint": {
+    "checkpoint_id": "cp-01",
+    "state_digest": "sha256:4cd581e21017e9d6959ab697c86856c032ef32867cd44d9d594d8936b91f4df1"
+  },
+  "consumer": {
+    "agent": "coding-agent"
+  },
+  "decisions": [
+    {
+      "choice": "Rotate one credential per day, not all at once.",
+      "decision_id": "D1",
+      "rationale": "A simultaneous rotation last year took down staging for six hours."
+    }
+  ],
+  "handoff_id": "auth-cleanup-2026-08-11",
+  "objects": [
+    {
+      "kind": "fact",
+      "object_id": "creds.count",
+      "provenance": "vault-listing/2026-08-11",
+      "required": true,
+      "value": 7
+    },
+    {
+      "kind": "fact",
+      "object_id": "audit.date",
+      "provenance": "ticket/OPS-233",
+      "required": true,
+      "value": "2026-09-01"
+    }
+  ],
+  "producer": {
+    "agent": "platform-lead",
+    "role": "human"
+  },
+  "provenance": {
+    "authority_root": "ticket/OPS-233",
+    "edges": [
+      [
+        "vault-listing/2026-08-11",
+        "ticket/OPS-233"
+      ],
+      [
+        "ticket/OPS-233",
+        "ticket/OPS-233"
+      ]
+    ]
+  },
+  "retained_constraints": [
+    {
+      "binding": "MUST",
+      "constraint_id": "C1",
+      "statement": "The billing worker's credential is rotated last; it has no retry and a failed rotation drops invoices."
+    },
+    {
+      "binding": "MUST",
+      "constraint_id": "C2",
+      "statement": "Every rotation is recorded in ticket OPS-233 before the next one starts."
+    },
+    {
+      "binding": "SHOULD",
+      "constraint_id": "C3",
+      "statement": "Prefer the vault CLI over the web console so the action is scriptable."
+    }
+  ],
+  "summary": {
+    "commitment": "sha256:a385f33bfbcdf1ae69002910298fa4fdcc5510ca81074fd7a73d35354e44a32a",
+    "text": "Seven service credentials need rotating before the 1 September audit. One per day, billing worker last. Log each rotation in OPS-233 before starting the next. The legacy reporting credential has no known owner and is blocking."
+  },
+  "task": {
+    "task_id": "ops/rotate-service-credentials",
+    "title": "Rotate the service credentials before the audit"
+  },
+  "unresolved": [
+    {
+      "blocking": true,
+      "issue_id": "U1",
+      "statement": "Nobody knows who owns the legacy reporting credential."
+    }
+  ]
+}

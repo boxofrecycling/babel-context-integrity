@@ -1,0 +1,69 @@
+name: "Babel Verify"
+description: >-
+  Check an agent handoff artifact against the Babel Handoff Contract. Fails the
+  check when a required constraint, decision, object or provenance chain did not
+  survive the handoff.
+branding:
+  icon: "git-commit"
+  color: "gray-dark"
+
+inputs:
+  handoff:
+    description: "Path to the handoff artifact to verify."
+    required: false
+    default: ".babel/handoff.json"
+  expect:
+    description: >-
+      Path to an expectation file the handoff must satisfy. Optional; without it
+      only internal consistency is checked.
+    required: false
+    default: ""
+  against:
+    description: >-
+      Path to a predecessor handoff. When set, `babelci diff` also runs and a
+      REFUSE verdict fails the check.
+    required: false
+    default: ""
+  strict:
+    description: "Treat a diff REVIEW verdict as a failure."
+    required: false
+    default: "false"
+  json-report:
+    description: "Write the machine-readable results to this path."
+    required: false
+    default: ""
+  version:
+    description: >-
+      Version specifier for babel-context-integrity. Pin this in production.
+    required: false
+    default: "babel-context-integrity==0.1.0"
+
+outputs:
+  verdict:
+    description: "PASS or FAIL from babelci verify."
+    value: ${{ steps.run.outputs.verdict }}
+  diff-verdict:
+    description: "SAFE, REVIEW or REFUSE when `against` was supplied."
+    value: ${{ steps.run.outputs.diff-verdict }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install babelci
+      shell: bash
+      # Passed through the environment rather than interpolated into the shell
+      # command, so a value containing shell metacharacters cannot escape.
+      env:
+        BABEL_VERSION_SPEC: ${{ inputs.version }}
+      run: python3 -m pip install --disable-pip-version-check --quiet "$BABEL_VERSION_SPEC"
+
+    - name: Verify handoff
+      id: run
+      shell: bash
+      env:
+        BABEL_HANDOFF: ${{ inputs.handoff }}
+        BABEL_EXPECT: ${{ inputs.expect }}
+        BABEL_AGAINST: ${{ inputs.against }}
+        BABEL_STRICT: ${{ inputs.strict }}
+        BABEL_JSON_REPORT: ${{ inputs.json-report }}
+      run: ${{ github.action_path }}/entrypoint.sh

@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install
+        run: python -m pip install --disable-pip-version-check -e ".[dev]"
+      - name: Test
+        run: python -m pytest -q
+      - name: Lab
+        run: babelci lab
+      - name: Lab is reproducible
+        run: |
+          babelci lab --json > first.json
+          babelci lab --json > second.json
+          diff first.json second.json
+      - name: Action works locally
+        run: ./action/test-local.sh
+
+  no-network:
+    # The package claims it cannot reach anything. This job removes the ability
+    # to reach anything and runs the whole suite again.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: python -m pip install --disable-pip-version-check -e ".[dev]"
+      - name: Run with outbound network blocked
+        run: |
+          sudo iptables -A OUTPUT -m owner --uid-owner "$(id -u)" \
+            ! -d 127.0.0.1 -j REJECT
+          python -m pytest -q
+          babelci lab
+          babelci demo > /dev/null
+
+  self-check:
+    # This repository verifies its own handoff artifact, which is the smallest
+    # honest demonstration that the tool is usable.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check -e .
+      - uses: ./action
+        with:
+          handoff: .babel/handoff.json
+          expect: .babel/expect.json
+          json-report: babel-report.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: babel-report
+          path: babel-report.json

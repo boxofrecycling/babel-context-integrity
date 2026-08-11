@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" width="640" height="400"
+     font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">
+  <title>Babel verification layers</title>
+  <desc>Eight verification layers. The first seven establish internal consistency;
+        only the eighth can speak to whether the described world occurred.</desc>
+  <style>
+    .lbl { fill: #16181d; }
+    .note { fill: #6b717d; font-size: 11px; }
+    .box { fill: #ffffff; stroke: #d8dae0; }
+    .ext { fill: #fff7e8; stroke: #d8a93c; }
+    .brace { stroke: #a8adb8; fill: none; }
+    @media (prefers-color-scheme: dark) {
+      .lbl { fill: #e6e8ec; }
+      .note { fill: #9aa0ac; }
+      .box { fill: #16191e; stroke: #2f343c; }
+      .ext { fill: #241d0c; stroke: #d8a93c; }
+      .brace { stroke: #565c68; }
+    }
+  </style>
+
+  <text class="lbl" x="20" y="24" font-size="14" font-weight="600">handoff.json</text>
+  <path class="brace" d="M112 19 h30" stroke-width="1.2"/>
+  <path class="brace" d="M136 15 l6 4 -6 4" stroke-width="1.2"/>
+
+  <g>
+    <rect class="box" x="150" y="44"  width="300" height="30" rx="4"/>
+    <text class="lbl" x="164" y="63">1  structure</text>
+    <text class="note" x="330" y="63">shape is legal</text>
+
+    <rect class="box" x="150" y="82"  width="300" height="30" rx="4"/>
+    <text class="lbl" x="164" y="101">2  identity</text>
+    <text class="note" x="330" y="101">names what you expected</text>
+
+    <rect class="box" x="150" y="120" width="300" height="30" rx="4"/>
+    <text class="lbl" x="164" y="139">3  checkpoint</text>
+    <text class="note" x="330" y="139">commitment recomputes</text>
+
+    <rect class="box" x="150" y="158" width="300" height="30" rx="4"/>
+    <text class="lbl" x="164" y="177">4  provenance</text>
+    <text class="note" x="330" y="177">reaches the root</text>
+
+    <rect class="box" x="150" y="196" width="300" height="30" rx="4"/>
+    <text class="lbl" x="164" y="215">5  retained constraints</text>
+    <text class="note" x="330" y="215">survived unmodified</text>
+
+    <rect class="box" x="150" y="234" width="300" height="30" rx="4"/>
+    <text class="lbl" x="164" y="253">6  conflicts</text>
+    <text class="note" x="330" y="253">fail closed, no tiebreak</text>
+
+    <rect class="box" x="150" y="272" width="300" height="30" rx="4"/>
+    <text class="lbl" x="164" y="291">7  authority agreement</text>
+    <text class="note" x="330" y="291">two encoders, no vote</text>
+  </g>
+
+  <path class="brace" d="M462 46 h10 v250 h-10" stroke-width="1.2"/>
+  <text class="note" x="482" y="164">INTERNAL</text>
+  <text class="note" x="482" y="180">CONSISTENCY</text>
+  <text class="note" x="482" y="204">cannot tell a true</text>
+  <text class="note" x="482" y="220">world from a</text>
+  <text class="note" x="482" y="236">coherent false one</text>
+
+  <rect class="ext" x="150" y="318" width="300" height="34" rx="4" stroke-width="1.5"/>
+  <text class="lbl" x="164" y="339" font-weight="600">8  external truth</text>
+  <text class="note" x="330" y="339">out-of-band receipt</text>
+
+  <path class="brace" d="M462 320 h10 v30 h-10" stroke-width="1.2"/>
+  <text class="note" x="482" y="331">the only layer that</text>
+  <text class="note" x="482" y="347">can reject a coherent</text>
+  <text class="note" x="482" y="363">false world</text>
+
+  <text class="note" x="20" y="339">common-mode</text>
+  <text class="note" x="20" y="355">fails here only</text>
+  <path class="brace" d="M110 334 h30" stroke-width="1.2"/>
+  <path class="brace" d="M134 330 l6 4 -6 4" stroke-width="1.2"/>
+</svg>

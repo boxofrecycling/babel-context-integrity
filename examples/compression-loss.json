@@ -1,0 +1,124 @@
+{
+  "aliases": [
+    [
+      "AP",
+      "auth.provider"
+    ]
+  ],
+  "artifacts": [
+    {
+      "digest": "sha256:1567b972b8767eca74add0edc2729443da133926d17a37b9cfc373c5bbf5b3ff",
+      "path": "src/auth/oidc.py",
+      "role": "implementation"
+    }
+  ],
+  "authorities": [
+    {
+      "authority_id": "agent-a",
+      "encoding": "babel/authority-a/document-tree/0.1",
+      "world_digest": "sha256:4401e275565c7249e45550c5f76a9b90f4da4392b2f5feb3b835307004cd6ff6"
+    }
+  ],
+  "babel_handoff": "0.1",
+  "checkpoint": {
+    "checkpoint_id": "cp-4412-02",
+    "parent_checkpoint_id": "cp-4412-01",
+    "state_digest": "sha256:4ad30d087841b268e9cfb2fbc8f1e26130b3b0cc83aac7e8c66740e461f5c1e2"
+  },
+  "consumer": {
+    "agent": "agent-c",
+    "role": "reviewer"
+  },
+  "decisions": [
+    {
+      "choice": "Use Okta as the OIDC provider.",
+      "decision_id": "D1",
+      "provenance": "scan/config",
+      "rationale": "Already the org IdP; no new vendor review needed."
+    },
+    {
+      "choice": "Migrate sessions lazily on next login.",
+      "decision_id": "D2",
+      "provenance": "query/db",
+      "rationale": "A batch job would need a maintenance window."
+    }
+  ],
+  "handoff_id": "handoff-4412-02",
+  "objects": [
+    {
+      "kind": "fact",
+      "object_id": "auth.provider",
+      "provenance": "scan/config",
+      "required": true,
+      "value": "okta-oidc"
+    },
+    {
+      "kind": "fact",
+      "object_id": "legacy.sessions",
+      "provenance": "query/db",
+      "required": true,
+      "value": 1843
+    },
+    {
+      "kind": "fact",
+      "object_id": "flag.name",
+      "provenance": "scan/config",
+      "required": false,
+      "value": "auth_oidc_enabled"
+    }
+  ],
+  "producer": {
+    "agent": "agent-b",
+    "role": "implementer",
+    "run_id": "run-0002"
+  },
+  "provenance": {
+    "authority_root": "repo@a1b2c3d4",
+    "edges": [
+      [
+        "scan/config",
+        "repo@a1b2c3d4"
+      ],
+      [
+        "query/db",
+        "repo@a1b2c3d4"
+      ]
+    ]
+  },
+  "retained_constraints": [
+    {
+      "binding": "MUST",
+      "constraint_id": "C1",
+      "provenance": "repo@a1b2c3d4",
+      "statement": "Do not drop the legacy session table until the migration is verified in production."
+    },
+    {
+      "binding": "MUST",
+      "constraint_id": "C2",
+      "provenance": "repo@a1b2c3d4",
+      "statement": "Every new endpoint must require the oidc:read scope."
+    },
+    {
+      "binding": "SHOULD",
+      "constraint_id": "C3",
+      "provenance": "repo@a1b2c3d4",
+      "statement": "Extend AuthMiddleware rather than adding a parallel auth path."
+    }
+  ],
+  "summary": {
+    "commitment": "sha256:acd1aeb6ec8ca21173725102951ed9ec366f0889d8bf52d877e7823415de6e79",
+    "text": "Migrated the auth layer to OIDC behind a feature flag. Okta is the provider. Sessions migrate lazily on next login; the legacy session table is still live and must not be dropped. All 312 baseline tests pass. Refresh-token rotation interval is still unagreed with security."
+  },
+  "task": {
+    "family": "code-migration",
+    "task_id": "PR-4412/migrate-auth-to-oidc",
+    "title": "Migrate the auth layer from session cookies to OIDC"
+  },
+  "unresolved": [
+    {
+      "blocking": true,
+      "issue_id": "U1",
+      "statement": "Refresh-token rotation interval is not agreed with the security team."
+    }
+  ]
+}

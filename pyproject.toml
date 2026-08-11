@@ -1,0 +1,70 @@
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[project]
+name = "babel-context-integrity"
+version = "0.1.0"
+description = "Verify what survives when one AI agent hands work to the next."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+authors = [
+    { name = "Scott Henry" },
+    { name = "Anthony Colasante" },
+]
+keywords = [
+    "agents", "handoff", "provenance", "context", "verification",
+    "integrity", "ci",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Software Development :: Testing",
+]
+# No runtime dependencies. This is deliberate: the tool has to be installable
+# into a locked-down CI image, and every dependency is another thing that could
+# open a socket.
+dependencies = []
+
+[project.optional-dependencies]
+# `jsonschema` is used only by tests/test_schema_parity.py, which checks the
+# native validator against the published JSON Schema.
+dev = ["pytest>=7.4", "jsonschema>=4.20"]
+
+[project.urls]
+Homepage = "https://github.com/babel-context-integrity/babel-context-integrity"
+Documentation = "https://github.com/babel-context-integrity/babel-context-integrity/tree/main/docs"
+Source = "https://github.com/babel-context-integrity/babel-context-integrity"
+
+[project.scripts]
+babelci = "babelci.cli:main"
+# `babel` is already the entry point of @babel/cli in the JavaScript ecosystem
+# and `babel` on PyPI is the i18n library, so the tool does not claim either.
+babel-verify = "babelci.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/babelci"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"schema/babel-handoff-0.1.schema.json" = "babelci/_schema/babel-handoff-0.1.schema.json"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src", "/schema", "/examples", "/tests", "/docs", "/paper",
+    "/action", "/integrations", "/README.md", "/LICENSE", "/NOTICE",
+    "/CITATION.cff", "/CHANGELOG.md",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = ["error"]
