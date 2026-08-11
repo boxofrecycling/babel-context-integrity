@@ -1,23 +1,23 @@
 # Distribution digests — v0.1.0
 
-Built locally with `python -m build`. **Not uploaded anywhere.**
+Built locally with `python -m build` at commit 8c54cfd.
+**Not uploaded anywhere.**
 
 ```
 62d7f896e4a7ea7e37068bde65ccabd98dcb58f6ebde4e90f197d8bbb7bea05c  babel_context_integrity-0.1.0-py3-none-any.whl
-c63ae82fda7af21a3b100470fa5ee4079b4143e3f5b541ed678279377d5d3eb3  babel_context_integrity-0.1.0.tar.gz
+b5105cb47a35998ae93493c573efc33bbe7977ef93360653372a0f143187d48a  babel_context_integrity-0.1.0.tar.gz
 ```
 
 Sizes:
 ```
 babel_context_integrity-0.1.0-py3-none-any.whl          53543 bytes
-babel_context_integrity-0.1.0.tar.gz                   127779 bytes
+babel_context_integrity-0.1.0.tar.gz                   127864 bytes
 ```
 
 ## Reproducibility
 
 The **wheel is bit-reproducible**: rebuilding from a fresh clone of the
-same commit, on the same Python, produces a byte-identical file. The
-digest above was confirmed identical across two independent trees.
+same commit, on the same Python, produces a byte-identical file.
 
 The **sdist is content-reproducible but not bit-reproducible**: its
 extracted tree is identical across builds, while the gzip container
@@ -28,9 +28,8 @@ than papered over.
 Verify either claim yourself:
 
 ```bash
-shasum -a 256 dist/*
-# wheel: rebuild and compare digests
-# sdist: extract both and `diff -r` the trees
+shasum -a 256 dist/*                # wheel: rebuild and compare
+tar xzf dist/*.tar.gz -C a && ...   # sdist: extract both, diff -r
 ```
 
 `release/DIGESTS.txt` is deliberately excluded from the sdist: an
