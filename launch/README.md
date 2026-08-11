@@ -18,10 +18,15 @@ from, no repository created, no registry entry reserved.
 Every piece leads with the same real finding, because it is the only part of
 this that is genuinely interesting:
 
-> Multiple independent validators can agree completely and still share the same
-> wrong assumption.
+> Multiple independent validators can agree on the same wrong world.
+> Babel separates agreement from truth.
 
-or, in product terms:
+The product framing of the same thing:
+
+> An agent handoff is a set of executable assumptions. Babel makes those
+> assumptions explicit and checkable.
+
+And the blunt version, for a title:
 
 > Your agent handoff can pass every check and still be wrong.
 
@@ -53,6 +58,8 @@ copy is not tested; that is what this list is for.
 - zero runtime dependencies, zero network access, enforced by tests
 - integrity machinery costs 32.3% of the example artifact — a measured number
 - one constructed case passes seven layers and is still entirely wrong
+- the wheel is bit-reproducible; rebuild it and compare the digest
+- every console block in the README is real output, asserted by a test
 
 ## Claims that are not
 

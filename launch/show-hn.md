@@ -8,14 +8,16 @@ Preferred:
 Show HN: Babel – verify what survives when one AI agent hands work to the next
 ```
 
-Alternate, leading with the negative result:
+Alternates, leading with the negative result:
 
 ```
+Show HN: Babel – multiple validators can agree on the same wrong world
 Show HN: A handoff verifier that passes every check and is still wrong
 ```
 
-The first is clearer about what it is. The second is more interesting but risks
-reading as a gimmick. Use the first.
+The first is clearest about what it is; use it. The alternates are more
+interesting but risk reading as a gimmick in a title, and the body carries that
+argument anyway.
 
 ## Body
 

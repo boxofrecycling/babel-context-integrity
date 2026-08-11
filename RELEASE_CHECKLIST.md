@@ -9,10 +9,10 @@ nothing below it has been done.
 
 - [x] `docs/LIMITS.md` is the claim boundary; every visible surface audited
       against it (`docs/CLAIM_AUDIT.md`)
-- [x] 111 tests pass, including README output fidelity and no-network
+- [x] 115 tests pass, including README and landing-page output fidelity, and no-network
       enforcement
 - [x] `babelci lab` — 15/15 cases at their declared layer
-- [x] `action/test-local.sh` — 8/8 without GitHub
+- [x] `action/test-local.sh` — 11/11 without GitHub, including annotations
 - [x] `sdist` and `wheel` build, inspected, installed clean, digests recorded
       (`release/DIGESTS.txt`)
 - [x] Disclosure scan on the working tree **and** on both archives

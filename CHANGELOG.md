@@ -75,6 +75,14 @@ First public release candidate. Nothing has been published to any registry.
   enforces this until publication.
 - Schema `$id` is a URN rather than an invented domain.
 
+### Release artifacts
+
+- `RELEASE_CHECKLIST.md` — what is done, what needs a human, and the exact
+  publication sequence.
+- `release/v0.1.0-notes.md` and `release/DIGESTS.txt`.
+- `docs/CLAIM_AUDIT.md` — every visible surface audited against `docs/LIMITS.md`.
+- `docs/FINDING_CODES.md` — every code the verifier can emit.
+
 ### Known open decisions
 
 - The `LICENSE` copyright line names one holder; whether it should name two is
