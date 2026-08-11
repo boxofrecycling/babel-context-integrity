@@ -12,9 +12,9 @@ where they quietly stop living, and nothing in your toolchain notices.
 Babel gives that story a contract, and checks it.
 
 ```console
-$ babelci verify .babel/handoff.json
+$ babelci verify examples/clean-handoff.json
 
-PASS  .babel/handoff.json
+PASS  examples/clean-handoff.json
   structure ............. verified   contract 0.1, 4 objects
   identity .............. verified   agent-a -> agent-b
   checkpoint ............ verified   cp-4412-01
@@ -29,9 +29,9 @@ Now the successor drops one constraint — the one that said *don't drop the
 legacy session table yet*. The prose summary still reads fine:
 
 ```console
-$ babelci verify .babel/handoff.json --expect .babel/expect.json
+$ babelci verify examples/corrupted-handoff.json --expect examples/expect.json
 
-FAIL  .babel/handoff.json
+FAIL  examples/corrupted-handoff.json
   structure ............. verified   contract 0.1, 4 objects
   identity .............. verified   agent-b -> agent-c
   checkpoint ............ verified   cp-4412-02
@@ -48,6 +48,10 @@ FAIL  .babel/handoff.json
 ```
 
 Exit code 1. Your CI check goes red.
+
+*(Both files ship in this repository — every console block below is real output
+you can reproduce, and a test asserts it stays that way. In your own project
+the conventional path is `.babel/handoff.json`.)*
 
 ---
 
@@ -78,8 +82,8 @@ FAIL  examples/common-mode-handoff.json
 
   EXTERNAL_RECEIPT_REJECTED
     repository working tree at repo@a1b2c3d4 rejected this world:
-    auth.provider is okta-oidc in the tree, not auth0-oidc;
-    legacy.sessions counted 1843 rows, not 12
+    auth.provider is okta-oidc in the tree, not auth0-oidc, legacy.sessions
+    counted 1843 rows, not 12, D1 contradicts the recorded provider
 ```
 
 Seven layers of checking accept a handoff describing a branch nobody worked on.
@@ -184,19 +188,23 @@ world. Two that differ by one character can describe incompatible ones. `diff`
 compares the *semantic world*, then applies a fixed rule table:
 
 ```console
-$ babelci diff .babel/handoff-01.json .babel/handoff-02.json
+$ babelci diff examples/clean.json examples/common-mode.json
 
 REFUSE
 
   REFUSE
-    decisions[D2]
+    decisions[D1]
       decision-reversed: choice changed under the same identifier
-    retained_constraints[C1]
-      must-constraint-removed: MUST constraint dropped
+
+  REVIEW
+    objects[auth.provider]
+      object-value-changed: fact value changed
+    objects[legacy.sessions]
+      object-value-changed: fact value changed
 
   SAFE
-    objects[migration.applied]
-      object-added: fact added
+    checkpoint
+      checkpoint-advanced: cp-4412-01 -> cp-4412-02
 ```
 
 Every verdict comes from exactly one rule, and `babelci rules` prints all of

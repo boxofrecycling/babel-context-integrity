@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import os
 import sys
+import textwrap
 from typing import Any
 
 from .contract import REFUSE, REVIEW, SAFE, SEVERITY_FAIL
@@ -45,6 +46,19 @@ def _dots(label: str) -> str:
     return f"{label} {'.' * pad}"
 
 
+def _wrap(text: str, indent: str) -> list[str]:
+    """Wrap a finding's prose so a long detail stays readable in a terminal.
+
+    Fixed width rather than the terminal's, so that output pasted into an
+    issue, a README or a CI log looks the same everywhere -- and so that
+    documentation showing this output cannot drift with window size.
+    """
+    wrapped = textwrap.wrap(
+        text, width=76 - len(indent), break_long_words=False,
+        break_on_hyphens=False)
+    return [indent + line for line in (wrapped or [""])]
+
+
 def render_verify(result: dict[str, Any], *, verbose: bool = False,
                   stream=None) -> str:
     stream = stream or sys.stdout
@@ -69,7 +83,7 @@ def render_verify(result: dict[str, Any], *, verbose: bool = False,
         lines.append("")
         for finding in failures:
             lines.append(f"  {_paint(finding['code'], '31', colour)}")
-            lines.append(f"    {finding['detail']}")
+            lines.extend(_wrap(finding["detail"], "    "))
             if "expected" in finding and "received" in finding:
                 lines.append(f"    expected: {_short(finding['expected'], verbose)}")
                 lines.append(f"    received: {_short(finding['received'], verbose)}")
@@ -80,7 +94,9 @@ def render_verify(result: dict[str, Any], *, verbose: bool = False,
     if notes and (verbose or not failures):
         lines.append("")
         for finding in notes:
-            lines.append(f"  note  {finding['detail']}")
+            wrapped = _wrap(finding["detail"], "        ")
+            lines.append("  note  " + wrapped[0].lstrip())
+            lines.extend(wrapped[1:])
 
     if verbose and result.get("computed"):
         lines.append("")

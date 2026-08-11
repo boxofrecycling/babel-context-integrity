@@ -93,3 +93,50 @@ def test_no_finding_code_is_dead():
         if path.name != "contract.py")
     unreachable = sorted(code for code in declared if code not in sources)
     assert not unreachable, f"finding codes nothing can emit: {unreachable}"
+
+
+def _console_blocks(text):
+    """Yield (command_argv, expected_output_lines) from ```console fences."""
+    for block in re.findall(r"```console\n(.*?)```", text, flags=re.DOTALL):
+        lines = block.rstrip("\n").split("\n")
+        if not lines or not lines[0].startswith("$ babelci "):
+            continue
+        argv = lines[0][len("$ babelci "):].split()
+        expected = [line for line in lines[1:] if line.strip()]
+        yield argv, expected
+
+
+def test_readme_console_output_matches_the_real_command():
+    """The README shows real output, or it shows a lie.
+
+    Every ```console block whose first line is a babelci invocation is run and
+    compared against what the tool actually prints. Composite or aspirational
+    output fails here.
+    """
+    import io
+    import os
+    from contextlib import redirect_stdout
+
+    from babelci.cli import main
+
+    text = (ROOT / "README.md").read_text(encoding="utf-8")
+    checked = 0
+    previous = os.getcwd()
+    os.chdir(ROOT)
+    try:
+        for argv, expected in _console_blocks(text):
+            if not any(part.startswith("examples/") for part in argv):
+                continue  # commands against a user's own .babel/ paths
+            buffer = io.StringIO()
+            with redirect_stdout(buffer):
+                main(argv)
+            actual = [line.rstrip() for line in buffer.getvalue().split("\n")
+                      if line.strip()]
+            for line in expected:
+                assert line.rstrip() in actual, (
+                    f"README shows a line `babelci {' '.join(argv)}` "
+                    f"does not print:\n  {line}")
+            checked += 1
+    finally:
+        os.chdir(previous)
+    assert checked >= 3, f"only {checked} README console blocks were verifiable"
