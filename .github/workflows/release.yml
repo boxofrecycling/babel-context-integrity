@@ -1,0 +1,218 @@
+# Publish an already-released tag to PyPI via Trusted Publishing.
+#
+# This workflow does not *create* a release. The GitHub Release, its tag and its
+# attached artifacts already exist and have already been qualified. Its job is
+# to prove that a specific set of bytes is simultaneously:
+#
+#   1. reproducible from the tagged source,
+#   2. byte-identical to the artifacts attached to the GitHub Release,
+#   3. byte-identical to the digests committed in `release/DIGESTS.txt` at that
+#      tag,
+#
+# and only then to hand those exact bytes to PyPI. If any of the three
+# disagree, nothing is published.
+#
+# Credentials: none. Trusted Publishing exchanges a short-lived OIDC token, so
+# there is no API token to store, leak or rotate. The `pypi` environment holds
+# no secrets and is restricted to the `main` branch.
+#
+# Trigger: manual only. Publishing is a deliberate act, not a side effect of a
+# push, and never runs from a pull request or a fork.
+
+name: Release to PyPI
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing release tag to publish (e.g. v0.1.0)"
+        required: true
+        type: string
+      dry-run:
+        description: "Verify everything and stop before uploading"
+        required: false
+        default: false
+        type: boolean
+
+# Read-only by default. The publish job adds exactly one permission it needs.
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Reproduce and verify the released artifacts
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.identity.outputs.version }}
+    steps:
+      - name: Validate the tag looks like a release tag
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          if ! printf '%s' "$TAG" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::refusing to publish from '$TAG'; expected vMAJOR.MINOR.PATCH"
+            exit 1
+          fi
+
+      - name: Check out the tag, not the branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+          persist-credentials: false
+
+      # Before anything reads pyproject.toml: tomllib needs 3.11+, and the
+      # runner's default interpreter is not something to depend on.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Confirm package identity matches the tag
+        id: identity
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          python <<'PYTHON'
+          import os, pathlib, sys, tomllib
+
+          project = tomllib.loads(pathlib.Path("pyproject.toml").read_text())["project"]
+          tag = os.environ["TAG"].lstrip("v")
+
+          if project["name"] != "babel-context-integrity":
+              sys.exit(f"::error::unexpected distribution name {project['name']!r}")
+          if project["version"] != tag:
+              sys.exit(f"::error::pyproject version {project['version']!r} != tag {tag!r}")
+
+          with open(os.environ["GITHUB_OUTPUT"], "a") as out:
+              out.write(f"version={project['version']}\n")
+          print(f"{project['name']} {project['version']} matches tag {os.environ['TAG']}")
+          PYTHON
+
+      - name: Rebuild from the tagged source
+        run: |
+          python -m pip install --disable-pip-version-check build
+          python -m build
+          echo "rebuilt:"
+          sha256sum dist/*
+
+      - name: Download the artifacts attached to the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          mkdir -p released
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --dir released \
+            --pattern '*.whl' --pattern '*.tar.gz'
+          echo "released:"
+          sha256sum released/*
+
+      - name: Require three-way byte equality
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          set -e
+          fail=0
+
+          # 1. rebuilt == attached to the GitHub Release
+          for built in dist/*; do
+            name=$(basename "$built")
+            if [ ! -f "released/$name" ]; then
+              echo "::error::$name is not attached to the $TAG release"
+              fail=1
+              continue
+            fi
+            if cmp -s "$built" "released/$name"; then
+              echo "identical to release asset:  $name"
+            else
+              echo "::error::$name rebuilt from source differs from the $TAG release asset"
+              fail=1
+            fi
+          done
+
+          # 2. rebuilt == the digests committed at the tag
+          if [ ! -f release/DIGESTS.txt ]; then
+            echo "::error::release/DIGESTS.txt is missing at $TAG"
+            exit 1
+          fi
+          for built in dist/*; do
+            name=$(basename "$built")
+            want=$(grep -F "  $name" release/DIGESTS.txt | awk '{print $1}' | head -1)
+            got=$(sha256sum "$built" | awk '{print $1}')
+            if [ -z "$want" ]; then
+              echo "::error::$name has no recorded digest in release/DIGESTS.txt"
+              fail=1
+            elif [ "$want" = "$got" ]; then
+              echo "matches committed digest:    $name"
+            else
+              echo "::error::$name digest $got != recorded $want"
+              fail=1
+            fi
+          done
+
+          if [ "$fail" -ne 0 ]; then
+            echo "::error::artifacts do not agree; nothing will be published"
+            exit 1
+          fi
+          echo "three-way byte equality established"
+
+      - name: Validate distribution metadata
+        run: |
+          python -m pip install --disable-pip-version-check twine
+          python -m twine check dist/*
+
+      - name: Smoke-test the wheel with no network
+        run: |
+          docker run --rm --network=none -v "$PWD:/w" -w /w python:3.12-slim bash -c '
+            set -e
+            pip install --no-index --no-deps --disable-pip-version-check dist/*.whl
+            babelci --version
+            babelci lab
+          '
+
+      - name: Hand the verified bytes to the publish job
+        uses: actions/upload-artifact@v4
+        with:
+          name: verified-dist
+          path: dist/
+          if-no-files-found: error
+
+  publish:
+    name: Publish to PyPI
+    needs: verify
+    runs-on: ubuntu-latest
+
+    # Registered with the PyPI Trusted Publisher. Restricted to `main`.
+    environment:
+      name: pypi
+      url: https://pypi.org/project/babel-context-integrity/${{ needs.verify.outputs.version }}/
+
+    permissions:
+      contents: read
+      # The whole credential. Exchanged for a short-lived PyPI token by the
+      # action below; nothing long-lived exists to be stolen.
+      id-token: write
+
+    steps:
+      # Only the verified bytes enter this job. No repository code is checked
+      # out or executed here.
+      - uses: actions/download-artifact@v4
+        with:
+          name: verified-dist
+          path: dist/
+
+      - name: Show exactly what is about to be uploaded
+        run: |
+          ls -l dist/
+          sha256sum dist/*
+
+      - name: Publish to PyPI
+        if: ${{ !inputs.dry-run }}
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          # attestations default to on for Trusted Publishing; stated
+          # explicitly so a future default change is a visible edit.
+          attestations: true
+          print-hash: true
+
+      - name: Dry run — stopped before upload
+        if: ${{ inputs.dry-run }}
+        run: echo "dry-run requested; artifacts verified but not uploaded"
