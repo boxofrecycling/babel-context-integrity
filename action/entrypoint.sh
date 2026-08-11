@@ -35,8 +35,9 @@ emit_summary() {
 
 if [ ! -f "$handoff" ]; then
     echo "babel-verify: no handoff artifact at '$handoff'" >&2
-    echo "babel-verify: the producing agent is expected to write one; see" >&2
-    echo "              https://github.com/babel-context-integrity/babel-context-integrity#integrations" >&2
+    echo "babel-verify: the producing agent is expected to write one." >&2
+    echo "babel-verify: see integrations/ for how a predecessor writes one," >&2
+    echo "babel-verify: or set the 'handoff' input to a different path." >&2
     exit 1
 fi
 
@@ -47,10 +48,58 @@ echo "── babelci verify $handoff"
 "$babelci" "${verify_args[@]}"
 verify_status=$?
 
+# The machine-readable result drives the annotations, and optionally the
+# report the caller asked for. Running the verifier twice is safe: it is
+# deterministic, offline and takes milliseconds.
+verify_json=$(mktemp)
+trap 'rm -f "$verify_json" "${diff_json:-}"' EXIT
+"$babelci" "${verify_args[@]}" --json >"$verify_json" 2>/dev/null || true
+
 if [ -n "$report" ]; then
     mkdir -p "$(dirname "$report")"
-    "$babelci" "${verify_args[@]}" --json >"$report"
+    cp "$verify_json" "$report"
 fi
+
+# GitHub renders `::error` as an inline annotation on the pull request, which
+# is where a developer actually looks. Without this the failure is buried in a
+# log nobody expands.
+annotate_verify() {
+    python3 - "$verify_json" "$handoff" <<'PY'
+import json, sys
+
+path, handoff = sys.argv[1], sys.argv[2]
+try:
+    with open(path) as handle:
+        result = json.load(handle)
+except (OSError, ValueError):
+    sys.exit(0)
+
+
+def clean(text):
+    # Annotation commands are newline-delimited; %0A keeps multi-line detail.
+    return str(text).replace("%", "%25").replace("\r", "").replace("\n", "%0A")
+
+
+for finding in result.get("findings", []):
+    if finding.get("severity") != "fail":
+        continue
+    detail = clean(finding.get("detail", ""))
+    if isinstance(finding.get("received"), list) and finding["received"]:
+        detail += "%0A" + "%0A".join("- " + clean(x) for x in finding["received"])
+    elif finding.get("expected") is not None:
+        detail += "%0A" + clean(f"expected: {finding['expected']}")
+        detail += "%0A" + clean(f"received: {finding.get('received')}")
+    print(f"::error file={handoff},title=Babel: {finding['code']}::{detail}")
+
+failed = [layer["layer"] for layer in result.get("layers", [])
+          if layer.get("status") == "failed"]
+if failed:
+    print(f"::notice file={handoff},title=Babel: layers that failed::"
+          + clean(", ".join(failed)))
+PY
+}
+
+annotate_verify
 
 if [ "$verify_status" -eq 0 ]; then
     emit_output verdict PASS
@@ -78,19 +127,64 @@ if [ -n "$against" ]; then
         *) diff_verdict=ERROR ;;
     esac
     emit_output diff-verdict "$diff_verdict"
+
+    diff_json=$(mktemp)
+    "$babelci" "diff" "$against" "$handoff" --json >"$diff_json" 2>/dev/null || true
+    python3 - "$diff_json" "$handoff" <<'PY'
+import json, sys
+
+path, handoff = sys.argv[1], sys.argv[2]
+try:
+    with open(path) as handle:
+        result = json.load(handle)
+except (OSError, ValueError):
+    sys.exit(0)
+
+level = {"REFUSE": "error", "REVIEW": "warning"}
+for change in result.get("changes", []):
+    kind = level.get(change["verdict"])
+    if not kind:
+        continue
+    detail = f"{change['subject']}: {change['headline']}"
+    print(f"::{kind} file={handoff},title=Babel diff: {change['rule']}::"
+          + detail.replace("%", "%25").replace("\n", "%0A"))
+PY
 fi
 
 {
     echo "### Babel Context Integrity"
     echo
     if [ "$verify_status" -eq 0 ]; then
-        echo "- verify: **PASS** (\`$handoff\`)"
+        echo "- **verify: PASS** — \`$handoff\`"
     else
-        echo "- verify: **FAIL** (\`$handoff\`) — a required part of the handoff did not survive"
+        echo "- **verify: FAIL** — \`$handoff\`"
+        python3 - "$verify_json" <<'PY'
+import json, sys
+try:
+    with open(sys.argv[1]) as handle:
+        result = json.load(handle)
+except (OSError, ValueError):
+    sys.exit(0)
+for layer in result.get("layers", []):
+    if layer.get("status") == "failed":
+        print(f"  - `{layer['layer']}` failed")
+for finding in result.get("findings", []):
+    if finding.get("severity") == "fail":
+        print(f"    - `{finding['code']}` — {finding['detail']}")
+PY
     fi
-    [ -n "$diff_verdict" ] && echo "- diff vs \`$against\`: **$diff_verdict**"
+    if [ -n "$diff_verdict" ]; then
+        echo "- **diff vs \`$against\`: $diff_verdict**"
+    fi
     echo
-    echo "Reproduce locally: \`babelci verify $handoff${expect:+ --expect $expect}\`"
+    echo "Reproduce locally:"
+    echo
+    echo '```'
+    echo "babelci verify $handoff${expect:+ --expect $expect}"
+    [ -n "$against" ] && echo "babelci diff $against $handoff"
+    echo '```'
+    echo
+    echo "What each layer does and does not establish: \`babelci explain $handoff\`"
 } | emit_summary
 
 # Usage errors (2) are failures too; anything non-zero fails the check.

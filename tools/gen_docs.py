@@ -9,7 +9,8 @@ Generated from `src/babelci/diff.py`. Do not edit by hand -- run
 `python tools/gen_docs.py`. `tests/test_docs.py` fails if this file drifts.
 
 `babelci diff` reports every change with a verdict, and every verdict comes
-from exactly one rule below. There is no scoring and no heuristic. A change
+from exactly one rule below. Human output leads with the sentence; the rule id
+is the machine handle and appears in `--json` and `-v`. There is no scoring and no heuristic. A change
 with no matching rule is reported as `REVIEW` under `unclassified-change`,
 which is itself a rule -- a human deciding beats a tool guessing.
 
@@ -27,7 +28,7 @@ for verdict in (REFUSE, REVIEW, SAFE):
     lines.append(f"\n## {verdict}\n")
     for name, rule in sorted(RULES.items()):
         if rule["verdict"] == verdict:
-            lines.append(f"### `{name}`\n")
-            lines.append(f"{rule['because'].capitalize()}.\n")
+            lines.append(f"### {rule['headline']}\n")
+            lines.append(f"Rule id `{name}`. {rule['because'].capitalize()}.\n")
 Path("docs/DIFF_RULES.md").write_text("\n".join(lines).replace("\n\n\n", "\n\n"), encoding="utf-8")
 print("wrote docs/DIFF_RULES.md")

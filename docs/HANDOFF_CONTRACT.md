@@ -254,6 +254,19 @@ against it:
 Every key is optional. Verification without an expectation still checks
 internal consistency; it just cannot know what was supposed to survive.
 
+| Key | What it makes the verifier check |
+|---|---|
+| `task_id`, `producer`, `consumer` | identity comparison |
+| `parent_checkpoint_id` | that this artifact builds on the expected predecessor |
+| `required_constraints` | each is present, and its statement is unchanged if a `statement_commitment` is given |
+| `required_objects` | each object id is still carried (aliases resolved) |
+| `required_decisions` | each decision is present *or* superseded by one that names it |
+| `required_unresolved` | each issue is still open *or* named by a decision's `supersedes` |
+
+`required_decisions` is a **presence** check. A decision that keeps its
+identifier and changes its content is a silent reversal, which one artifact
+cannot evidence — `babelci diff` against the predecessor is what refuses that.
+
 ## Compatibility policy
 
 See [COMPATIBILITY.md](COMPATIBILITY.md).

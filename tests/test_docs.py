@@ -140,3 +140,91 @@ def test_readme_console_output_matches_the_real_command():
     finally:
         os.chdir(previous)
     assert checked >= 3, f"only {checked} README console blocks were verifiable"
+
+
+def test_no_url_points_at_a_repository_that_does_not_exist():
+    """Metadata that 404s is worse than metadata that is absent.
+
+    Until the repository is published, nothing may link to a plausible-looking
+    URL for it. `site/index.html` uses the greppable token
+    PLACEHOLDER_REPOSITORY_URL instead, which RELEASE_CHECKLIST.md covers.
+    """
+    forbidden = [
+        "github.com/babel-context-integrity",
+        "babel-context-integrity.dev",
+        "verify-action@v0",
+    ]
+    offenders = []
+    for path in ROOT.rglob("*"):
+        if not path.is_file() or any(
+                part in (".git", ".venv", "__pycache__", "dist", "build")
+                for part in path.parts):
+            continue
+        if path.suffix not in (".md", ".toml", ".cff", ".json", ".yml", ".yaml",
+                               ".html", ".sh", ".py"):
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace")
+        for needle in forbidden:
+            if needle in text and path.name != "test_docs.py":
+                offenders.append(f"{path.relative_to(ROOT)}: {needle}")
+    assert not offenders, offenders
+
+
+def test_placeholders_are_confined_to_undeployed_material():
+    """A placeholder in shipped code or metadata would be a bug, not a TODO."""
+    shipped = list((ROOT / "src").rglob("*.py")) + [
+        ROOT / "pyproject.toml", ROOT / "CITATION.cff", ROOT / "README.md",
+        ROOT / "LICENSE", ROOT / "NOTICE",
+    ]
+    for path in shipped:
+        assert "PLACEHOLDER_REPOSITORY_URL" not in path.read_text(
+            encoding="utf-8"), path
+
+
+def test_landing_page_terminal_blocks_match_real_output():
+    """The site shows the same output the tool prints, or it shows a mockup.
+
+    Only the finding lines are compared -- the page strips the trailing `note`
+    output for space, which is a presentation choice rather than a fabrication.
+    """
+    import io
+    import os
+    import re as _re
+    from contextlib import redirect_stdout
+
+    from babelci.cli import main
+
+    page = ROOT / "site" / "index.html"
+    if not page.exists():
+        pytest.skip("no landing page in this checkout")
+
+    html = page.read_text(encoding="utf-8")
+    blocks = _re.findall(r"<pre>(.*?)</pre>", html, flags=_re.DOTALL)
+
+    previous = os.getcwd()
+    os.chdir(ROOT)
+    checked = 0
+    try:
+        for block in blocks:
+            text = _re.sub(r"<[^>]+>", "", block)
+            text = (text.replace("&gt;", ">").replace("&lt;", "<")
+                        .replace("&amp;", "&"))
+            lines = [line.rstrip() for line in text.split("\n") if line.strip()]
+            if not lines or not lines[0].startswith("$ babelci "):
+                continue
+            argv = lines[0][len("$ babelci "):].split()
+            if not any(part.startswith("examples/") for part in argv):
+                continue
+            buffer = io.StringIO()
+            with redirect_stdout(buffer):
+                main(argv)
+            actual = [line.rstrip() for line in buffer.getvalue().split("\n")
+                      if line.strip()]
+            for line in lines[1:]:
+                assert line in actual, (
+                    f"site shows a line `babelci {' '.join(argv)}` does not "
+                    f"print:\n  {line}")
+            checked += 1
+    finally:
+        os.chdir(previous)
+    assert checked >= 1, "no verifiable terminal block found on the landing page"

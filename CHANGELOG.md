@@ -52,6 +52,29 @@ First public release candidate. Nothing has been published to any registry.
   roadmap, related-work review.
 - Technical report draft with references and a reproducibility appendix.
 
+### Release-freeze changes
+
+- `required_decisions` in an expectation is now checked. It was documented and
+  advertised before it was implemented; the code was changed to match the claim
+  rather than the claim softened. New code `REQUIRED_DECISION_MISSING`.
+- `babelci diff` human output leads with a plain sentence and shows the actual
+  before/after values. Rule ids moved to `--json` and `-v`, where a machine
+  handle belongs.
+- Long finding details wrap at a fixed width, so terminal, CI log and README
+  output are identical. A rejecting external receipt lists its findings one per
+  line instead of printing a Python repr.
+- The GitHub Action emits `::error` annotations for every failing finding and
+  every `REFUSE` change, so failures appear inline on the pull request rather
+  than only in the log. The step summary names the failed layers and the exact
+  commands to reproduce locally.
+- `babelci demo` explains *why* the external-truth layer differs in kind from
+  authority agreement, rather than only asserting that it does.
+- Removed every URL pointing at a repository that does not exist. Package
+  metadata carries no `[project.urls]`, `CITATION.cff` carries no
+  `repository-code`, and the landing page uses a greppable placeholder. A test
+  enforces this until publication.
+- Schema `$id` is a URN rather than an invented domain.
+
 ### Known open decisions
 
 - The `LICENSE` copyright line names one holder; whether it should name two is

@@ -31,7 +31,8 @@ from .contract import (
     LAYER_PROVENANCE, LAYER_STRUCTURE, PROVENANCE_CHAIN_BROKEN, PROVENANCE_CYCLE,
     PRODUCER_IDENTITY_MISMATCH, PROVENANCE_EDGE_DANGLING,
     PROVENANCE_ROOT_UNDECLARED,
-    REQUIRED_OBJECT_MISSING, RETAINED_CONSTRAINT_MISSING,
+    REQUIRED_DECISION_MISSING, REQUIRED_OBJECT_MISSING,
+    RETAINED_CONSTRAINT_MISSING,
     RETAINED_CONSTRAINT_MODIFIED,
     SEVERITY_FAIL, SEVERITY_NOTE, SUMMARY_COMMITMENT_MISMATCH, SUMMARY_DOMAIN,
     TASK_IDENTITY_MISMATCH, UNRESOLVED_ISSUE_UNDECLARED,
@@ -223,6 +224,22 @@ def verify(handoff: Any, *, expectation: dict[str, Any] | None = None,
                             "handoff and is absent; the artifact is still valid "
                             "JSON and no longer carries what the task needs",
                             expected=object_id, received=None)
+        # Presence only. A decision that changes its *content* under the same
+        # identifier is a silent reversal, and a single artifact contains no
+        # evidence that it happened -- that is `babelci diff`'s job, and the
+        # `decision-reversed` lab case exists to keep the distinction honest.
+        present_decisions = {item["decision_id"]
+                             for item in handoff.get("decisions", []) or []}
+        superseded_by = {item.get("supersedes")
+                         for item in handoff.get("decisions", []) or []}
+        for decision_id in expectation.get("required_decisions", []) or []:
+            if decision_id in present_decisions or decision_id in superseded_by:
+                continue
+            layers.fail(LAYER_CONSTRAINTS, REQUIRED_DECISION_MISSING,
+                        f"decision {decision_id!r} was required to survive this "
+                        "handoff and is neither present nor superseded by a "
+                        "decision that names it",
+                        expected=decision_id, received=None)
         for issue_id in expectation.get("required_unresolved", []) or []:
             known = {item["issue_id"]
                      for item in handoff.get("unresolved", []) or []}
@@ -303,11 +320,12 @@ def verify(handoff: Any, *, expectation: dict[str, Any] | None = None,
                         "than this artifact encodes",
                         expected=world_digest, received=receipt["world_digest"])
         elif not receipt["accepted"]:
+            # The issuer's findings are the useful content, so they are carried
+            # as a list and rendered as one line each rather than flattened
+            # into a sentence that runs off the side of the terminal.
             layers.fail(LAYER_EXTERNAL, EXTERNAL_RECEIPT_REJECTED,
-                        f"{receipt['trust_root']} rejected this world"
-                        + (": " + ", ".join(receipt.get("findings", []))
-                           if receipt.get("findings") else ""),
-                        received=receipt.get("findings", []))
+                        f"{receipt['trust_root']} rejected this world",
+                        received=list(receipt.get("findings", [])))
         else:
             layers.note(LAYER_EXTERNAL, f"accepted by {receipt['trust_root']}")
 

@@ -1,5 +1,20 @@
 # Contributing
 
+## Get running in one minute
+
+```bash
+git clone <repository> && cd babel-context-integrity
+python -m venv .venv && ./.venv/bin/pip install -e ".[dev]"
+
+./.venv/bin/python -m pytest -q     # the suite
+./.venv/bin/babelci lab             # the failure classes
+./.venv/bin/babelci demo            # what the tool is for
+./action/test-local.sh              # the CI action, without GitHub
+```
+
+No network is needed after install, and there is nothing else to configure.
+If `pytest` passes and `babelci lab` says `PASS`, you are set up.
+
 ## The rule that governs everything
 
 **No layer may claim more than it checks.**
@@ -34,16 +49,65 @@ right. That is intentional: without it, the layering claim is untested.
 yourself wanting a heuristic, the answer is `REVIEW` under
 `unclassified-change` — a human deciding beats a tool guessing.
 
-## Changing the contract
+## Adding a lab mutation
 
-Read [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md) first. Adding an optional
-field is compatible. Changing a digest recipe, a required field, or the meaning
-of a code is breaking and needs a contract version bump — and a v0.1 verifier
-must keep refusing v0.2 artifacts rather than mis-verifying them.
+The lab is how a claim about the verifier becomes a test. A new failure class
+is one function and one table entry in `src/babelci/lab/cases.py`:
+
+```python
+def case_my_failure() -> dict[str, Any]:
+    """One sentence: what went wrong in the world, not in the JSON."""
+    handoff = _successor(clean())
+    ...                      # exactly one named mutation
+    return _reseal(handoff)  # omit if the point is that it was NOT resealed
+```
+
+```python
+{
+    "id": "my-failure",
+    "title": "A short human title",
+    "build": case_my_failure,
+    "expect_verdict": "FAIL",
+    "expect_layer": LAYER_PROVENANCE,   # which layer must catch it
+    "teaches": "What a reader should take away.",
+    "mirrors": "<private result id, or the closest one>",
+},
+```
+
+Two rules:
+
+- **one named mutation per case.** The value of the lab is that the difference
+  between pass and fail is always a single edit a reader can hold in their head.
+- **declare the layer.** A case that fails at the wrong layer fails the lab even
+  when the verdict is right. Without that, the layering claim is untested.
+
+Run `babelci lab` and then `babelci lab --out examples` if the case should ship
+as an example.
+
+## Proposing a schema or protocol change
+
+Read [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md) first, then say in the pull
+request which of these your change is — reviewers will ask:
+
+| Change | Impact | What it needs |
+|---|---|---|
+| new optional field | **compatible** | schema + native validator + a lab case |
+| new finding code or diff rule | **compatible** | documentation, or `test_docs.py` fails |
+| a check that catches strictly more, same meaning | **compatible** | a lab case proving the new catch |
+| new or removed **required** field | **breaking** | contract version bump |
+| changed digest recipe or canonical encoding | **breaking** | contract version bump |
+| changed meaning of a code, or of a layer status | **breaking** | contract version bump |
+
+A breaking change means `babel_handoff` goes to `0.2`, and a `0.1` verifier
+must keep **refusing** `0.2` artifacts rather than mis-verifying them. That is
+loud by construction, and the loudness is the feature.
 
 Both the native validator (`src/babelci/schema.py`) and the JSON Schema
 (`schema/`) must change together. `tests/test_schema_parity.py` fails otherwise,
 which is the point of having two.
+
+If you are unsure whether something is breaking, open an issue describing the
+change before writing it. That is cheaper for both of us than a rejected PR.
 
 ## Things that will be declined
 

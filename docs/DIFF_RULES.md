@@ -4,7 +4,8 @@ Generated from `src/babelci/diff.py`. Do not edit by hand -- run
 `python tools/gen_docs.py`. `tests/test_docs.py` fails if this file drifts.
 
 `babelci diff` reports every change with a verdict, and every verdict comes
-from exactly one rule below. There is no scoring and no heuristic. A change
+from exactly one rule below. Human output leads with the sentence; the rule id
+is the machine handle and appears in `--json` and `-v`. There is no scoring and no heuristic. A change
 with no matching rule is reported as `REVIEW` under `unclassified-change`,
 which is itself a rule -- a human deciding beats a tool guessing.
 
@@ -18,114 +19,114 @@ The overall verdict is the worst individual verdict.
 
 ## REFUSE
 
-### `alias-bijection-lost`
+### Two names now collapse onto one object.
 
-Two names now collapse onto one object, so a reference that used to be unambiguous no longer is.
+Rule id `alias-bijection-lost`. Two names now collapse onto one object, so a reference that used to be unambiguous no longer is.
 
-### `authority-root-changed`
+### Facts now trace to a different authority.
 
-The successor traces its facts to a different authority than the predecessor did.
+Rule id `authority-root-changed`. The successor traces its facts to a different authority than the predecessor did.
 
-### `conflict-introduced`
+### Contradictory values are now asserted for one object.
 
-The successor asserts contradictory values for one object.
+Rule id `conflict-introduced`. The successor asserts contradictory values for one object.
 
-### `decision-removed`
+### A decision disappeared rather than being superseded.
 
-A decision disappeared rather than being superseded, so the successor may silently reopen it.
+Rule id `decision-removed`. A decision disappeared rather than being superseded, so the successor may silently reopen it.
 
-### `decision-reversed`
+### A recorded decision changed without declaring what it replaced.
 
-A recorded decision changed without declaring what it supersedes, so the reversal is invisible to anyone reading the successor.
+Rule id `decision-reversed`. A recorded decision changed without declaring what it supersedes, so the reversal is invisible to anyone reading the successor.
 
-### `external-acceptance-lost`
+### An outside checker used to accept this world and no longer does.
 
-An out-of-band receipt used to accept this world and no longer does.
+Rule id `external-acceptance-lost`. An out-of-band receipt used to accept this world and no longer does.
 
-### `must-constraint-modified`
+### A MUST constraint changed meaning under the same name.
 
-A must constraint kept its identifier but changed meaning, which is how a rewritten rule passes as the original.
+Rule id `must-constraint-modified`. A must constraint kept its identifier but changed meaning, which is how a rewritten rule passes as the original.
 
-### `must-constraint-removed`
+### A MUST constraint stopped being carried.
 
-A constraint the predecessor marked must no longer survives.
+Rule id `must-constraint-removed`. A constraint the predecessor marked must no longer survives.
 
-### `required-object-removed`
+### A required object is gone.
 
-An object the predecessor marked required is gone.
+Rule id `required-object-removed`. An object the predecessor marked required is gone.
 
-### `task-identity-changed`
+### The two artifacts are about different tasks.
 
-The two artifacts are about different work, so nothing else in the comparison is meaningful.
+Rule id `task-identity-changed`. The two artifacts are about different work, so nothing else in the comparison is meaningful.
 
 ## REVIEW
 
-### `checkpoint-reparented`
+### The checkpoint changed without naming the predecessor.
 
-The checkpoint changed without naming the predecessor as parent, so the two artifacts may not be on the same line of work.
+Rule id `checkpoint-reparented`. The checkpoint changed without naming the predecessor as parent, so the two artifacts may not be on the same line of work.
 
-### `decision-superseded`
+### A decision was replaced by one that names it.
 
-The decision changed and said so; a human should confirm the reversal was intended.
+Rule id `decision-superseded`. The decision changed and said so; a human should confirm the reversal was intended.
 
-### `object-removed`
+### An optional object was dropped.
 
-An optional object was dropped, which is what compaction does and also what context loss looks like.
+Rule id `object-removed`. An optional object was dropped, which is what compaction does and also what context loss looks like.
 
-### `object-value-changed`
+### An object now asserts a different value.
 
-The same object now asserts a different value.
+Rule id `object-value-changed`. The same object now asserts a different value.
 
-### `provenance-edge-removed`
+### A provenance edge was dropped.
 
-A provenance edge was dropped; run verify on the successor to see whether the chain still reaches the root.
+Rule id `provenance-edge-removed`. A provenance edge was dropped; run verify on the successor to see whether the chain still reaches the root.
 
-### `should-constraint-modified`
+### An advisory constraint changed meaning under the same name.
 
-An advisory constraint changed meaning under the same identifier.
+Rule id `should-constraint-modified`. An advisory constraint changed meaning under the same identifier.
 
-### `should-constraint-removed`
+### An advisory constraint was dropped.
 
-An advisory constraint was dropped; this may be intended.
+Rule id `should-constraint-removed`. An advisory constraint was dropped; this may be intended.
 
-### `unclassified-change`
+### The artifacts differ in a way v0.1 has no rule for.
 
-The artifacts differ in a way v0.1 has no rule for; a human decides rather than the tool guessing.
+Rule id `unclassified-change`. The artifacts differ in a way v0.1 has no rule for; a human decides rather than the tool guessing.
 
-### `unresolved-issue-dropped`
+### An open question vanished without being resolved.
 
-An open question vanished without a decision resolving it.
+Rule id `unresolved-issue-dropped`. An open question vanished without a decision resolving it.
 
 ## SAFE
 
-### `checkpoint-advanced`
+### The checkpoint advanced from its declared parent.
 
-The successor names the predecessor as its parent checkpoint.
+Rule id `checkpoint-advanced`. The successor names the predecessor as its parent checkpoint.
 
-### `conflict-resolved`
+### A contradiction was resolved.
 
-A contradiction present in the predecessor is gone.
+Rule id `conflict-resolved`. A contradiction present in the predecessor is gone.
 
-### `constraint-added`
+### A new constraint was recorded.
 
-Adding a constraint narrows what the successor may do.
+Rule id `constraint-added`. Adding a constraint narrows what the successor may do.
 
-### `decision-added`
+### A new decision was recorded.
 
-New decisions are the normal product of doing the work.
+Rule id `decision-added`. New decisions are the normal product of doing the work.
 
-### `object-added`
+### A new object was recorded.
 
-New objects are the normal product of doing the work.
+Rule id `object-added`. New objects are the normal product of doing the work.
 
-### `provenance-edge-added`
+### A provenance edge was added.
 
-Additional provenance can only lengthen the chain.
+Rule id `provenance-edge-added`. Additional provenance can only lengthen the chain.
 
-### `unresolved-issue-added`
+### A new open question was recorded.
 
-The successor inherits a newly surfaced open question.
+Rule id `unresolved-issue-added`. The successor inherits a newly surfaced open question.
 
-### `unresolved-issue-resolved`
+### An open question was closed by a decision that names it.
 
-The open question is named by a decision that supersedes it.
+Rule id `unresolved-issue-resolved`. The open question is named by a decision that supersedes it.

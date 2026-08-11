@@ -49,9 +49,16 @@ FAIL  examples/corrupted-handoff.json
 
 Exit code 1. Your CI check goes red.
 
-*(Both files ship in this repository — every console block below is real output
-you can reproduce, and a test asserts it stays that way. In your own project
-the conventional path is `.babel/handoff.json`.)*
+```bash
+pip install babel-context-integrity
+babelci demo        # the whole thing in 60 seconds, offline
+```
+
+Python 3.10+. Zero dependencies, zero network, zero telemetry.
+
+*(Both example files ship in this repository. Every console block in this README
+is real output you can reproduce, and a test asserts it stays that way — in your
+own project the conventional path is `.babel/handoff.json`.)*
 
 ---
 
@@ -81,9 +88,10 @@ FAIL  examples/common-mode-handoff.json
   external truth ........ FAILED
 
   EXTERNAL_RECEIPT_REJECTED
-    repository working tree at repo@a1b2c3d4 rejected this world:
-    auth.provider is okta-oidc in the tree, not auth0-oidc, legacy.sessions
-    counted 1843 rows, not 12, D1 contradicts the recorded provider
+    repository working tree at repo@a1b2c3d4 rejected this world
+      - auth.provider is okta-oidc in the tree, not auth0-oidc
+      - legacy.sessions counted 1843 rows, not 12
+      - D1 contradicts the recorded provider
 ```
 
 Seven layers of checking accept a handoff describing a branch nobody worked on.
@@ -193,18 +201,19 @@ $ babelci diff examples/clean.json examples/common-mode.json
 REFUSE
 
   REFUSE
-    decisions[D1]
-      decision-reversed: choice changed under the same identifier
+    A recorded decision changed without declaring what it replaced.
+      decisions[D1]
+        was  "Use Okta as the OIDC provider."
+        now  "Use Auth0 as the OIDC provider."
 
   REVIEW
-    objects[auth.provider]
-      object-value-changed: fact value changed
-    objects[legacy.sessions]
-      object-value-changed: fact value changed
+    An object now asserts a different value.
+      objects[auth.provider]    okta-oidc -> auth0-oidc
+      objects[legacy.sessions]  1843 -> 12
 
   SAFE
-    checkpoint
-      checkpoint-advanced: cp-4412-01 -> cp-4412-02
+    The checkpoint advanced from its declared parent.
+      checkpoint  cp-4412-01 -> cp-4412-02
 ```
 
 Every verdict comes from exactly one rule, and `babelci rules` prints all of
@@ -212,12 +221,16 @@ them with the reasoning. There is no scoring and no heuristic; a change with no
 matching rule is reported as `REVIEW` under the rule `unclassified-change`,
 because a human deciding beats a tool guessing.
 
+Human output leads with what changed and shows the values. Rule ids are the
+machine handle and appear in `--json` and under `-v`, which also prints the
+reasoning behind each verdict.
+
 Rules: [docs/DIFF_RULES.md](docs/DIFF_RULES.md).
 
 ## GitHub Action
 
 ```yaml
-- uses: ./action           # or babel-context-integrity/verify-action@v0
+- uses: ./action           # vendored; see docs/CI.md for other CI systems
   with:
     handoff: .babel/handoff.json
     expect: .babel/expect.json

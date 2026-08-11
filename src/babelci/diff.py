@@ -33,120 +33,147 @@ _ORDER = {SAFE: 0, REVIEW: 1, REFUSE: 2}
 RULES: dict[str, dict[str, str]] = {
     "task-identity-changed": {
         "verdict": REFUSE,
+        "headline": "The two artifacts are about different tasks.",
         "because": "the two artifacts are about different work, so nothing else "
                    "in the comparison is meaningful",
     },
     "authority-root-changed": {
         "verdict": REFUSE,
+        "headline": "Facts now trace to a different authority.",
         "because": "the successor traces its facts to a different authority than "
                    "the predecessor did",
     },
     "must-constraint-removed": {
         "verdict": REFUSE,
+        "headline": "A MUST constraint stopped being carried.",
         "because": "a constraint the predecessor marked MUST no longer survives",
     },
     "must-constraint-modified": {
         "verdict": REFUSE,
+        "headline": "A MUST constraint changed meaning under the same name.",
         "because": "a MUST constraint kept its identifier but changed meaning, "
                    "which is how a rewritten rule passes as the original",
     },
     "should-constraint-removed": {
         "verdict": REVIEW,
+        "headline": "An advisory constraint was dropped.",
         "because": "an advisory constraint was dropped; this may be intended",
     },
     "should-constraint-modified": {
         "verdict": REVIEW,
+        "headline": "An advisory constraint changed meaning under the same name.",
         "because": "an advisory constraint changed meaning under the same identifier",
     },
     "constraint-added": {
         "verdict": SAFE,
+        "headline": "A new constraint was recorded.",
         "because": "adding a constraint narrows what the successor may do",
     },
     "decision-reversed": {
         "verdict": REFUSE,
+        "headline": "A recorded decision changed without declaring what it replaced.",
         "because": "a recorded decision changed without declaring what it supersedes, "
                    "so the reversal is invisible to anyone reading the successor",
     },
     "decision-superseded": {
         "verdict": REVIEW,
+        "headline": "A decision was replaced by one that names it.",
         "because": "the decision changed and said so; a human should confirm the "
                    "reversal was intended",
     },
     "decision-removed": {
         "verdict": REFUSE,
+        "headline": "A decision disappeared rather than being superseded.",
         "because": "a decision disappeared rather than being superseded, so the "
                    "successor may silently reopen it",
     },
     "decision-added": {
         "verdict": SAFE,
+        "headline": "A new decision was recorded.",
         "because": "new decisions are the normal product of doing the work",
     },
     "required-object-removed": {
         "verdict": REFUSE,
+        "headline": "A required object is gone.",
         "because": "an object the predecessor marked required is gone",
     },
     "object-removed": {
         "verdict": REVIEW,
+        "headline": "An optional object was dropped.",
         "because": "an optional object was dropped, which is what compaction does "
                    "and also what context loss looks like",
     },
     "object-value-changed": {
         "verdict": REVIEW,
+        "headline": "An object now asserts a different value.",
         "because": "the same object now asserts a different value",
     },
     "object-added": {
         "verdict": SAFE,
+        "headline": "A new object was recorded.",
         "because": "new objects are the normal product of doing the work",
     },
     "unresolved-issue-dropped": {
         "verdict": REVIEW,
+        "headline": "An open question vanished without being resolved.",
         "because": "an open question vanished without a decision resolving it",
     },
     "unresolved-issue-resolved": {
         "verdict": SAFE,
+        "headline": "An open question was closed by a decision that names it.",
         "because": "the open question is named by a decision that supersedes it",
     },
     "unresolved-issue-added": {
         "verdict": SAFE,
+        "headline": "A new open question was recorded.",
         "because": "the successor inherits a newly surfaced open question",
     },
     "alias-bijection-lost": {
         "verdict": REFUSE,
+        "headline": "Two names now collapse onto one object.",
         "because": "two names now collapse onto one object, so a reference that "
                    "used to be unambiguous no longer is",
     },
     "provenance-edge-removed": {
         "verdict": REVIEW,
+        "headline": "A provenance edge was dropped.",
         "because": "a provenance edge was dropped; run verify on the successor to "
                    "see whether the chain still reaches the root",
     },
     "provenance-edge-added": {
         "verdict": SAFE,
+        "headline": "A provenance edge was added.",
         "because": "additional provenance can only lengthen the chain",
     },
     "checkpoint-advanced": {
         "verdict": SAFE,
+        "headline": "The checkpoint advanced from its declared parent.",
         "because": "the successor names the predecessor as its parent checkpoint",
     },
     "checkpoint-reparented": {
         "verdict": REVIEW,
+        "headline": "The checkpoint changed without naming the predecessor.",
         "because": "the checkpoint changed without naming the predecessor as parent, "
                    "so the two artifacts may not be on the same line of work",
     },
     "conflict-introduced": {
         "verdict": REFUSE,
+        "headline": "Contradictory values are now asserted for one object.",
         "because": "the successor asserts contradictory values for one object",
     },
     "conflict-resolved": {
         "verdict": SAFE,
+        "headline": "A contradiction was resolved.",
         "because": "a contradiction present in the predecessor is gone",
     },
     "external-acceptance-lost": {
         "verdict": REFUSE,
+        "headline": "An outside checker used to accept this world and no longer does.",
         "because": "an out-of-band receipt used to accept this world and no longer does",
     },
     "unclassified-change": {
         "verdict": REVIEW,
+        "headline": "The artifacts differ in a way v0.1 has no rule for.",
         "because": "the artifacts differ in a way v0.1 has no rule for; a human "
                    "decides rather than the tool guessing",
     },
@@ -171,6 +198,7 @@ def diff(old: dict[str, Any], new: dict[str, Any], *,
         changes.append({
             "rule": rule,
             "verdict": _verdict(rule),
+            "headline": RULES[rule]["headline"],
             "subject": subject,
             "detail": detail,
             "because": RULES[rule]["because"],

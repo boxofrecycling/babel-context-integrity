@@ -1,0 +1,15 @@
+# Distribution digests — v0.1.0
+
+Built locally with `python -m build`. **Not uploaded anywhere.**
+Recompute with: `shasum -a 256 dist/*`
+
+```
+62d7f896e4a7ea7e37068bde65ccabd98dcb58f6ebde4e90f197d8bbb7bea05c  babel_context_integrity-0.1.0-py3-none-any.whl
+793c3d72166fc0af6d4fd21a02decd071dbf199c4dc60611855505de8ae31e37  babel_context_integrity-0.1.0.tar.gz
+```
+
+Sizes:
+```
+babel_context_integrity-0.1.0-py3-none-any.whl          53543 bytes
+babel_context_integrity-0.1.0.tar.gz                   127991 bytes
+```

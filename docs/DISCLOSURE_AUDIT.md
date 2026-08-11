@@ -9,11 +9,15 @@ releasable, and what was deliberately left out. It is published because a
 project that asks you to trust its verification claims should show its own
 work.
 
-Audited: 11 August 2026, against the state at the second commit.
+Audited twice: once against the release candidate, and again at the release
+freeze against the final tree **and** against the built `sdist` and `wheel`,
+which are separate surfaces — an archive can contain a file the working tree
+scan skipped.
 
 ## What was scanned
 
-Every file in the repository, excluding `.venv/` and `.git/`.
+Every file in the repository, excluding `.venv/` and `.git/`; then every file
+inside `dist/*.tar.gz` and `dist/*.whl`, extracted and scanned independently.
 
 | Check | Result |
 |---|---|

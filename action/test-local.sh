@@ -86,6 +86,43 @@ else
     fail=$((fail + 1))
 fi
 
+# Annotations: GitHub renders these inline on the pull request, so their
+# absence is a silent UX failure rather than a loud one.
+export BABEL_AGAINST="$work/clean.json"
+export BABEL_JSON_REPORT=""
+export BABEL_HANDOFF="$work/constraint-dropped.json"
+annotations=$("$here/entrypoint.sh" 2>&1 | grep -c '^::error ' || true)
+if [ "$annotations" -ge 2 ]; then
+    printf 'ok    %-46s %s emitted\n' "error annotations" "$annotations"
+    pass=$((pass + 1))
+else
+    printf 'FAIL  %-46s %s emitted, wanted >=2\n' "error annotations" "$annotations"
+    fail=$((fail + 1))
+fi
+
+export BABEL_HANDOFF="$work/clean.json"
+export BABEL_AGAINST=""
+noise=$("$here/entrypoint.sh" 2>&1 | grep -c '^::error ' || true)
+if [ "$noise" -eq 0 ]; then
+    printf 'ok    %-46s none on success\n' "no spurious annotations"
+    pass=$((pass + 1))
+else
+    printf 'FAIL  %-46s %s on a passing handoff\n' "no spurious annotations" "$noise"
+    fail=$((fail + 1))
+fi
+
+# Step summary: the thing a reviewer reads at the top of the run.
+summary="$work/summary.md"
+export BABEL_HANDOFF="$work/constraint-dropped.json"
+GITHUB_STEP_SUMMARY="$summary" "$here/entrypoint.sh" >/dev/null 2>&1
+if grep -q "RETAINED_CONSTRAINT_MISSING" "$summary" 2>/dev/null; then
+    printf 'ok    %-46s names the failure\n' "step summary"
+    pass=$((pass + 1))
+else
+    printf 'FAIL  %-46s missing or vague\n' "step summary"
+    fail=$((fail + 1))
+fi
+
 echo
 echo "$pass passed, $fail failed"
 [ "$fail" -eq 0 ] || exit 1

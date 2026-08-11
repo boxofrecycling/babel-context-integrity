@@ -28,6 +28,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Software Development :: Quality Assurance",
     "Topic :: Software Development :: Testing",
 ]
@@ -41,10 +42,10 @@ dependencies = []
 # native validator against the published JSON Schema.
 dev = ["pytest>=7.4", "jsonschema>=4.20"]
 
-[project.urls]
-Homepage = "https://github.com/babel-context-integrity/babel-context-integrity"
-Documentation = "https://github.com/babel-context-integrity/babel-context-integrity/tree/main/docs"
-Source = "https://github.com/babel-context-integrity/babel-context-integrity"
+# [project.urls] is deliberately absent. No repository exists yet, and metadata
+# pointing at a URL that 404s is worse than metadata with no URL at all. Add
+# Homepage / Source / Documentation in the same commit that creates the
+# repository. See RELEASE_CHECKLIST.md.
 
 [project.scripts]
 babelci = "babelci.cli:main"
@@ -59,10 +60,16 @@ packages = ["src/babelci"]
 "schema/babel-handoff-0.1.schema.json" = "babelci/_schema/babel-handoff-0.1.schema.json"
 
 [tool.hatch.build.targets.sdist]
+# Everything needed to rebuild, test and reproduce the published claims --
+# and nothing else. `site/` (an undeployed landing page) and `launch/`
+# (unpublished announcement drafts) are deliberately excluded: they are working
+# material, not part of the distribution.
 include = [
-    "/src", "/schema", "/examples", "/tests", "/docs", "/paper",
-    "/action", "/integrations", "/README.md", "/LICENSE", "/NOTICE",
-    "/CITATION.cff", "/CHANGELOG.md",
+    "/src", "/schema", "/tests", "/tools", "/examples",
+    "/docs", "/paper", "/action", "/integrations",
+    "/README.md", "/LICENSE", "/NOTICE", "/CITATION.cff",
+    "/CHANGELOG.md", "/CONTRIBUTING.md", "/SECURITY.md",
+    "/RELEASE_CHECKLIST.md", "/release",
 ]
 
 [tool.pytest.ini_options]

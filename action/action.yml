@@ -1,8 +1,11 @@
 name: "Babel Verify"
 description: >-
   Check an agent handoff artifact against the Babel Handoff Contract. Fails the
-  check when a required constraint, decision, object or provenance chain did not
-  survive the handoff.
+  check when a constraint, object or decision the repository required did not
+  survive the handoff, when a commitment no longer recomputes, when provenance
+  no longer reaches its authority root, or when an out-of-band receipt rejects
+  the world the artifact describes. It does not check whether the artifact is
+  true; see docs/LIMITS.md.
 branding:
   icon: "git-commit"
   color: "gray-dark"

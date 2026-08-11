@@ -25,5 +25,9 @@ keywords:
   - continuous integration
 license: Apache-2.0
 version: 0.1.0
+# `date-released` is the date this release candidate was frozen. Update it if
+# publication slips to a different day.
 date-released: "2026-08-11"
-repository-code: "https://github.com/babel-context-integrity/babel-context-integrity"
+# `repository-code`, `url` and `doi` are deliberately absent: no repository is
+# published and no DOI has been minted. Adding a field that does not resolve
+# would make this file wrong rather than incomplete. See RELEASE_CHECKLIST.md.

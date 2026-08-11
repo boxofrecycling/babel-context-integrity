@@ -84,7 +84,11 @@ def render_verify(result: dict[str, Any], *, verbose: bool = False,
         for finding in failures:
             lines.append(f"  {_paint(finding['code'], '31', colour)}")
             lines.extend(_wrap(finding["detail"], "    "))
-            if "expected" in finding and "received" in finding:
+            if isinstance(finding.get("received"), list) and finding["received"]:
+                # A list of reasons reads as a list, not as a Python repr.
+                for item in finding["received"]:
+                    lines.extend(_wrap(f"- {item}", "      "))
+            elif "expected" in finding and "received" in finding:
                 lines.append(f"    expected: {_short(finding['expected'], verbose)}")
                 lines.append(f"    received: {_short(finding['received'], verbose)}")
             elif "received" in finding:
@@ -155,21 +159,75 @@ def render_diff(result: dict[str, Any], *, verbose: bool = False,
         return "\n".join(lines)
 
     for wanted in (REFUSE, REVIEW, SAFE):
-        group = [c for c in result["changes"] if c["verdict"] == wanted]
+        group = [change for change in result["changes"]
+                 if change["verdict"] == wanted]
         if not group:
             continue
         lines.append("")
         lines.append(f"  {_paint(wanted, _VERDICT_STYLE[wanted], colour)}")
-        for change in group:
-            lines.append(f"    {change['subject']}")
-            lines.append(f"      {change['rule']}: {change['detail']}")
+
+        # Group by rule so the reader gets one plain sentence per kind of
+        # change, then the instances underneath. The rule id is a machine
+        # handle; it belongs in --json and -v, not at the front of the line a
+        # developer reads first.
+        for index, rule in enumerate(_rules_in_order(group)):
+            instances = [c for c in group if c["rule"] == rule]
+            if index:
+                lines.append("")
+            lines.append(f"    {instances[0]['headline']}")
             if verbose:
-                lines.append(f"      because {change['because']}")
-                if change.get("before") is not None:
-                    lines.append(f"      before: {_short(change['before'], verbose)}")
-                if change.get("after") is not None:
-                    lines.append(f"      after:  {_short(change['after'], verbose)}")
+                lines.extend(_wrap(f"({instances[0]['because']})", "      "))
+                lines.append(f"      rule: {rule}")
+            # Align the value column across the instances of one rule.
+            width = max(len(c["subject"]) for c in instances)
+            for change in instances:
+                lines.extend(_change_lines(change, verbose, width))
     return "\n".join(lines)
+
+
+def _rules_in_order(group: list[dict[str, Any]]) -> list[str]:
+    seen: list[str] = []
+    for change in group:
+        if change["rule"] not in seen:
+            seen.append(change["rule"])
+    return seen
+
+
+def _change_lines(change: dict[str, Any], verbose: bool,
+                  width: int) -> list[str]:
+    """Render one instance: what it is, and what actually changed."""
+    before, after = change.get("before"), change.get("after")
+    subject = change["subject"].ljust(width)
+
+    left = _value(before, verbose)
+    right = _value(after, verbose)
+    inline_budget = 56 - width
+
+    if before is not None and after is not None:
+        # Short values read better on one line than stacked.
+        if len(left) + len(right) + 4 <= inline_budget:
+            return [f"      {subject}  {left} -> {right}"]
+        return [f"      {change['subject']}",
+                f"        was  {left}",
+                f"        now  {right}"]
+    if before is not None:
+        if len(left) <= inline_budget:
+            return [f"      {subject}  was {left}"]
+        return [f"      {change['subject']}", f"        was  {left}"]
+    if after is not None:
+        if len(right) <= inline_budget:
+            return [f"      {subject}  {right}"]
+        return [f"      {change['subject']}", f"        {right}"]
+    return [f"      {subject}  {change['detail']}"]
+
+
+def _value(value: Any, verbose: bool) -> str:
+    if value is None:
+        return "(absent)"
+    if isinstance(value, str):
+        text = value if verbose or len(value) <= 88 else value[:85] + "..."
+        return f'"{text}"' if " " in text or not text else text
+    return _short(value, verbose)
 
 
 __all__ = ["render_verify", "render_explain", "render_diff"]

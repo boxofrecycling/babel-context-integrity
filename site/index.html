@@ -1,4 +1,13 @@
 <!doctype html>
+<!--
+  NOT DEPLOYED. Before this page goes anywhere, replace every occurrence of
+  PLACEHOLDER_REPOSITORY_URL with the real repository URL:
+
+      sed -i '' 's|PLACEHOLDER_REPOSITORY_URL|https://github.com/OWNER/REPO|g' index.html
+
+  The waitlist form is not connected to a backend and collects nothing.
+  See RELEASE_CHECKLIST.md.
+-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -185,7 +194,7 @@ footer a { color: var(--muted); }
 
   <div class="cta">
     <a class="btn primary" href="#install">Install</a>
-    <a class="btn" href="https://github.com/babel-context-integrity/babel-context-integrity">GitHub</a>
+    <a class="btn" href="PLACEHOLDER_REPOSITORY_URL">GitHub</a>
     <a class="btn" href="#waitlist">Hosted beta waitlist</a>
   </div>
 </header>
@@ -231,19 +240,20 @@ it is wrong. Every internal check passes:</p>
 <pre><span class="p">$</span> babelci verify examples/common-mode-handoff.json
 
 <span class="bad">FAIL</span>  examples/common-mode-handoff.json
-  structure ............. <span class="ok">verified</span>
-  identity .............. <span class="ok">verified</span>
-  checkpoint ............ <span class="ok">verified</span>
-  provenance ............ <span class="ok">verified</span>
-  retained constraints .. <span class="ok">verified</span>
-  conflicts ............. <span class="ok">verified</span>
-  authority agreement ... <span class="ok">verified</span>
+  structure ............. <span class="ok">verified</span>   contract 0.1, 4 objects
+  identity .............. <span class="ok">verified</span>   agent-b -&gt; agent-c
+  checkpoint ............ <span class="ok">verified</span>   cp-4412-02
+  provenance ............ <span class="ok">verified</span>   4 objects to repo@a1b2c3d4
+  retained constraints .. <span class="ok">verified</span>   2 MUST, 1 SHOULD
+  conflicts ............. <span class="ok">verified</span>   none
+  authority agreement ... <span class="ok">verified</span>   3 encodings agree
   external truth ........ <span class="bad">FAILED</span>
 
   <span class="bad">EXTERNAL_RECEIPT_REJECTED</span>
-    repository working tree at repo@a1b2c3d4 rejected this world:
-    auth.provider is okta-oidc in the tree, not auth0-oidc, legacy.sessions
-    counted 1843 rows, not 12, D1 contradicts the recorded provider</pre>
+    repository working tree at repo@a1b2c3d4 rejected this world
+      - auth.provider is okta-oidc in the tree, not auth0-oidc
+      - legacy.sessions counted 1843 rows, not 12
+      - D1 contradicts the recorded provider</pre>
 </div>
 
 <p>Two encoders sharing no code agree completely — because they are both
@@ -378,9 +388,9 @@ by the lab, not estimated.</p>
 
 <footer>
   <p>Open source under Apache-2.0 ·
-     <a href="https://github.com/babel-context-integrity/babel-context-integrity">GitHub</a> ·
-     <a href="https://github.com/babel-context-integrity/babel-context-integrity/blob/main/docs/LIMITS.md">Limits</a> ·
-     <a href="https://github.com/babel-context-integrity/babel-context-integrity/blob/main/paper/README.md">Technical report</a></p>
+     <a href="PLACEHOLDER_REPOSITORY_URL">GitHub</a> ·
+     <a href="PLACEHOLDER_REPOSITORY_URL/blob/main/docs/LIMITS.md">Limits</a> ·
+     <a href="PLACEHOLDER_REPOSITORY_URL/blob/main/paper/README.md">Technical report</a></p>
   <p>Created by Scott Henry and Anthony Colasante.</p>
   <p style="margin-top:1.4rem; font-size:.8rem">No vendor named in the
   documentation has endorsed, reviewed, or is affiliated with this project.</p>

@@ -119,3 +119,42 @@ def test_no_expectation_still_checks_internal_consistency():
     assert result["verdict"] == "FAIL"
     result = verify(cases.build("constraint-dropped"))
     assert result["verdict"] == "PASS"  # nothing said C1 had to survive
+
+
+def test_required_decision_must_survive_or_be_superseded():
+    """A dropped decision fails on its own, not as a side effect of resealing."""
+    from babelci.seal import seal
+
+    expectation = {**cases.expectation(), "required_decisions": ["D1", "D2"]}
+    assert verify(cases.clean(), expectation=expectation)["verdict"] == "PASS"
+
+    dropped = cases.clean()
+    dropped["decisions"] = [d for d in dropped["decisions"]
+                            if d["decision_id"] != "D2"]
+    dropped = seal(dropped, declare_authority="agent-a")
+
+    result = verify(dropped, expectation=expectation)
+    assert codes(result) == {contract.REQUIRED_DECISION_MISSING}
+    assert layer(result, contract.LAYER_CONSTRAINTS)["status"] == FAILED
+
+
+def test_a_superseded_decision_satisfies_the_requirement():
+    """Superseding is how a decision legitimately leaves the artifact."""
+    from babelci.seal import seal
+
+    expectation = {**cases.expectation(), "required_decisions": ["D2"]}
+    replaced = cases.clean()
+    replaced["decisions"] = [d for d in replaced["decisions"]
+                             if d["decision_id"] != "D2"]
+    replaced["decisions"].append({
+        "decision_id": "D9", "choice": "Batch-migrate after all.",
+        "supersedes": "D2", "provenance": "query/db"})
+    replaced = seal(replaced, declare_authority="agent-a")
+    assert verify(replaced, expectation=expectation)["verdict"] == "PASS"
+
+
+def test_required_decisions_do_not_catch_a_silent_reversal():
+    """The honest limit, asserted so it cannot be quietly widened later."""
+    expectation = {**cases.expectation(), "required_decisions": ["D1", "D2"]}
+    result = verify(cases.build("decision-reversed"), expectation=expectation)
+    assert result["verdict"] == "PASS"

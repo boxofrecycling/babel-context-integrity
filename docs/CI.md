@@ -22,7 +22,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - uses: babel-context-integrity/verify-action@v0
+      # Vendor the action into your repo, or reference it by path from a
+      # checkout of this one. A published marketplace action does not exist yet.
+      - uses: ./babel-action
         with:
           handoff: .babel/handoff.json
           expect: .babel/expect.json
@@ -35,7 +37,7 @@ produces a perfectly consistent handoff; only comparing it to the previous one
 shows the reversal. Supply `against:` to run `babelci diff` as well.
 
 ```yaml
-      - uses: babel-context-integrity/verify-action@v0
+      - uses: ./babel-action
         with:
           handoff: .babel/handoff.json
           against: .babel/handoff-previous.json
@@ -81,7 +83,7 @@ The action fails the check on any non-zero exit:
 
 The action is a wrapper over the CLI, so it can be run directly by setting the
 same environment variables Actions would set. `test-local.sh` does that across
-seven scenarios and asserts the exit codes:
+eleven scenarios and asserts the exit codes, the annotations and the summary:
 
 ```
 ok    clean handoff passes                           exit 0
@@ -92,7 +94,46 @@ ok    normal progress diffs SAFE                     exit 0
 ok    silent reversal diffs REFUSE                   exit 1
 ok    strict mode still passes SAFE                  exit 0
 ok    json report                                    written
+ok    error annotations                              2 emitted
+ok    no spurious annotations                        none on success
+ok    step summary                                   names the failure
+
+11 passed, 0 failed
 ```
+
+## What a failure looks like on the pull request
+
+Every failing finding is emitted as a GitHub `::error` annotation against the
+handoff file, so it appears inline on the PR rather than only in the log:
+
+```
+Babel: RETAINED_CONSTRAINT_MISSING
+  constraint 'C1' was required to survive this handoff and is absent
+  expected: C1
+  received: None
+```
+
+`diff` verdicts annotate too — `REFUSE` as an error, `REVIEW` as a warning.
+
+The step summary at the top of the run names the layers that failed, the
+finding codes, and the exact commands to reproduce it locally:
+
+```markdown
+### Babel Context Integrity
+
+- **verify: FAIL** — `.babel/handoff.json`
+  - `retained constraints` failed
+    - `RETAINED_CONSTRAINT_MISSING` — constraint 'C1' was required to survive
+      this handoff and is absent
+- **diff vs `.babel/handoff-previous.json`: REFUSE**
+
+Reproduce locally:
+
+    babelci verify .babel/handoff.json --expect .babel/expect.json
+    babelci diff .babel/handoff-previous.json .babel/handoff.json
+```
+
+A passing handoff produces no annotations at all.
 
 If you want to run it in a container, `docker run --network=none` works — the
 CLI never needs the network after install.

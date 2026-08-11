@@ -115,6 +115,16 @@ An object the expectation required is absent. The artifact is still valid JSON
 and still internally consistent; it just no longer carries what the task needs.
 This is what compaction loss looks like.
 
+### `REQUIRED_DECISION_MISSING`
+A decision the expectation required is neither present nor named by another
+decision's `supersedes`. It was dropped rather than superseded, so the
+successor is free to reopen it.
+
+**Presence only.** A decision that keeps its identifier and changes its
+*content* is a silent reversal, and a single artifact contains no evidence that
+it happened. That is `babelci diff`'s job — see the `decision-reversed` case in
+[RESULTS.md](RESULTS.md).
+
 ### `UNRESOLVED_ISSUE_UNDECLARED`
 An open issue the expectation tracks is neither still listed in `unresolved`
 nor named by a decision's `supersedes`. It did not get resolved; it got

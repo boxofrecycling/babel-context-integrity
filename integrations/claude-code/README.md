@@ -71,7 +71,7 @@ The constraints arrive as constraints rather than as a paragraph.
 ## 4. Refuse silent reversals in CI
 
 ```yaml
-- uses: babel-context-integrity/verify-action@v0
+- uses: ./babel-action      # vendored; see ../../docs/CI.md
   with:
     handoff: .babel/handoff.json
     against: .babel/handoff-previous.json

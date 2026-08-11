@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://babel-context-integrity.dev/schema/babel-handoff-0.1.schema.json",
+  "$id": "urn:babel-context-integrity:schema:babel-handoff:0.1",
   "title": "Babel Handoff Contract v0.1",
   "description": "A structured record of what one agent claims happened, what must survive into the next agent, and what evidence binds those claims. Structural validity is necessary and never sufficient; see docs/HANDOFF_CONTRACT.md.",
   "type": "object",

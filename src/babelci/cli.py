@@ -119,12 +119,19 @@ def cmd_rules(args: argparse.Namespace) -> int:
     if args.json:
         print(json.dumps(diff_module.RULES, indent=2, sort_keys=True))
         return EXIT_OK
+    import textwrap
+
     for verdict in (REFUSE, REVIEW, "SAFE"):
         print(verdict)
-        for name, rule in sorted(diff_module.RULES.items()):
-            if rule["verdict"] == verdict:
-                print(f"  {name}")
-                print(f"    {rule['because']}")
+        rules = sorted(
+            ((name, rule) for name, rule in diff_module.RULES.items()
+             if rule["verdict"] == verdict),
+            key=lambda entry: entry[1]["headline"])
+        for name, rule in rules:
+            print(f"  {rule['headline']}")
+            for line in textwrap.wrap(rule["because"], width=70):
+                print(f"      {line}")
+            print(f"      [{name}]")
         print()
     return EXIT_OK
 
