@@ -94,10 +94,11 @@ files verify **PASS** and their expectation requires `R1`–`R4`; `C1` belongs t
 the `examples/` fixtures. The output had been transplanted from the README's
 `examples/corrupted-handoff.json` case and relabelled.
 
-Nothing was published from either draft — the live v0.1.0 release notes and
-`release/v0.1.0-notes.md` always used the real `examples/` command — but the
-Show HN body is the most scrutinised text this project will post, and it
-advertised a command that prints the opposite of what it showed.
+At the time the defect was found, neither draft had yet been published — and
+the live v0.1.0 release notes and `release/v0.1.0-notes.md` always used the
+real `examples/` command — but the Show HN body is the most scrutinised text
+this project will post, and it advertised a command that prints the opposite of
+what it showed.
 
 Both now use the real invocation and its real output, and
 `test_launch_copy_console_output_matches_the_real_command` runs every

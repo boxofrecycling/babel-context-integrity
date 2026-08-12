@@ -83,10 +83,10 @@ traffic firewalled off. No telemetry, no config file, no daemon.
 Honest scoping, since this space is crowded: structured agent handoffs are not
 new. CLAN (github.com/saieeshward/clan) is a handoff file format with
 checksums, a JSON Schema, provenance and a validate command, and the
-`agent-handoff` GitHub topic carries 67 repositories. What I haven't found
-elsewhere is the layer separation, the "not established" state, two encoders
-with no tiebreak, and an external-truth layer that can reject what everything
-else accepted.
+`agent-handoff` GitHub topic already contains dozens of repositories. What I
+haven't found elsewhere is the layer separation, the "not established" state,
+two encoders with no tiebreak, and an external-truth layer that can reject what
+everything else accepted.
 
 Also honest: no language model was involved in any of this. The lab agents are
 fixtures. What's real is the verifier's behaviour on them. A controlled

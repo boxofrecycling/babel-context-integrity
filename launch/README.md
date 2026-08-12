@@ -1,8 +1,10 @@
 # Launch package
 
-Draft copy. **Nothing here has been posted.** The repository is public, the
-v0.1.0 release exists and `babel-context-integrity` 0.1.0 is on PyPI — but no
-Show HN, X, Reddit, LinkedIn or blog post has been submitted from any account.
+The prepared copy for announcing Babel Context Integrity. The repository, the
+v0.1.0 release and the `babel-context-integrity` package on PyPI are public;
+these files are the text written to announce them.
+
+This directory is not a record of which announcements were posted, or when.
 
 | File | For |
 |---|---|
