@@ -1,7 +1,8 @@
 # Launch package
 
-Draft copy. **Nothing here has been published.** No account has been posted
-from, no repository created, no registry entry reserved.
+Draft copy. **Nothing here has been posted.** The repository is public, the
+v0.1.0 release exists and `babel-context-integrity` 0.1.0 is on PyPI — but no
+Show HN, X, Reddit, LinkedIn or blog post has been submitted from any account.
 
 | File | For |
 |---|---|
