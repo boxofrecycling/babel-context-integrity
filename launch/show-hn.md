@@ -35,22 +35,26 @@ checkpoint binding, provenance connectivity, constraint survival, conflicts,
 agreement between two independently implemented encoders, and acceptance by an
 out-of-band receipt.
 
-    $ babelci verify .babel/handoff.json --expect .babel/expect.json
+    $ babelci verify examples/corrupted-handoff.json --expect examples/expect.json
 
-    FAIL  .babel/handoff.json
-      structure ............. verified
-      identity .............. verified
-      checkpoint ............ verified
-      provenance ............ verified
+    FAIL  examples/corrupted-handoff.json
+      structure ............. verified   contract 0.1, 4 objects
+      identity .............. verified   agent-b -> agent-c
+      checkpoint ............ verified   cp-4412-02
+      provenance ............ verified   4 objects to repo@a1b2c3d4
       retained constraints .. FAILED
-      conflicts ............. verified
-      authority agreement ... verified
+      conflicts ............. verified   none
+      authority agreement ... verified   3 encodings agree
       external truth ........ not established
 
       RETAINED_CONSTRAINT_MISSING
         constraint 'C1' was required to survive this handoff and is absent
+        expected: C1
+        received: None
 
-Exit 1, CI goes red.
+Exit 1, CI goes red. Both files ship in the repo, so that is a command you can
+run against a fresh clone; in your own project the conventional path is
+.babel/handoff.json.
 
 The part I actually want to show you is the last line of that output.
 

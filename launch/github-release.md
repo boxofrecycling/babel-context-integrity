@@ -26,13 +26,13 @@ summary. Constraints live in that summary and can quietly stop living there.
 Babel gives the handoff a machine-readable contract and checks it.
 
 ```
-$ babelci verify .babel/handoff.json --expect .babel/expect.json
+$ babelci verify examples/corrupted-handoff.json --expect examples/expect.json
 
-FAIL  .babel/handoff.json
-  structure ............. verified   contract 0.1, 5 objects
+FAIL  examples/corrupted-handoff.json
+  structure ............. verified   contract 0.1, 4 objects
   identity .............. verified   agent-b -> agent-c
   checkpoint ............ verified   cp-4412-02
-  provenance ............ verified   5 objects to repo@a1b2c3d4
+  provenance ............ verified   4 objects to repo@a1b2c3d4
   retained constraints .. FAILED
   conflicts ............. verified   none
   authority agreement ... verified   3 encodings agree
@@ -40,6 +40,8 @@ FAIL  .babel/handoff.json
 
   RETAINED_CONSTRAINT_MISSING
     constraint 'C1' was required to survive this handoff and is absent
+    expected: C1
+    received: None
 ```
 
 ### Highlights

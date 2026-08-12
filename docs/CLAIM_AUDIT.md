@@ -83,8 +83,30 @@ Three tests keep this from decaying:
   recording that, against a declared contract. The following paragraph in every
   surface using this line makes the object of the checking explicit.
 
+## The second thing that was wrong
+
+The v0.1.0 audit recorded `launch/*.md` as clean. It was not, and the reason is
+worth stating: the audit checked launch copy for *forbidden claims* and no test
+checked it for *false output*. Two drafts — `launch/show-hn.md` and the
+superseded `launch/github-release.md` — showed a `FAIL` against
+`.babel/handoff.json` citing a constraint `C1`. The repository's own `.babel/`
+files verify **PASS** and their expectation requires `R1`–`R4`; `C1` belongs to
+the `examples/` fixtures. The output had been transplanted from the README's
+`examples/corrupted-handoff.json` case and relabelled.
+
+Nothing was published from either draft — the live v0.1.0 release notes and
+`release/v0.1.0-notes.md` always used the real `examples/` command — but the
+Show HN body is the most scrutinised text this project will post, and it
+advertised a command that prints the opposite of what it showed.
+
+Both now use the real invocation and its real output, and
+`test_launch_copy_console_output_matches_the_real_command` runs every
+`$ babelci` block in `launch/` against the tool. The README test skips
+`.babel/` paths deliberately, since those stand in for a user's own project;
+that skip is what let the launch drafts drift.
+
 ## What this audit does not cover
 
-Launch copy is drafted but unpublished; if it is edited before posting, it is
-outside this audit. `launch/README.md` carries the banned-phrase list and the
-list of claims that are and are not safe to make.
+Prose in launch copy is still unasserted for tone and framing —
+`launch/README.md` carries the banned-phrase list and the list of claims that
+are and are not safe to make. Only the console blocks are mechanically checked.

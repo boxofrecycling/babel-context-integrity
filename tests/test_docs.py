@@ -142,6 +142,74 @@ def test_readme_console_output_matches_the_real_command():
     assert checked >= 3, f"only {checked} README console blocks were verifiable"
 
 
+def _indented_console_blocks(text):
+    """Yield (argv, expected_lines) for `$ babelci ...` blocks at any indent.
+
+    Launch copy nests terminal output inside an outer fence, so the invocation
+    is indented rather than starting the line. A block runs from the `$` line
+    until the first non-blank line indented less than it, then is dedented by
+    the `$` line's own indent.
+    """
+    lines = text.split("\n")
+    for index, line in enumerate(lines):
+        stripped = line.lstrip()
+        if not stripped.startswith("$ babelci "):
+            continue
+        indent = len(line) - len(stripped)
+        argv = stripped[len("$ babelci "):].split()
+        body = []
+        for following in lines[index + 1:]:
+            if not following.strip():
+                continue
+            if following.strip().startswith("```"):
+                break
+            if len(following) - len(following.lstrip()) < indent:
+                break
+            body.append(following[indent:].rstrip())
+        yield argv, body
+
+
+def test_launch_copy_console_output_matches_the_real_command():
+    """Launch copy is the most scrutinised text this project will publish.
+
+    The README and landing page are already asserted against real output.
+    Launch drafts were not, and drifted: two blocks showed a FAIL against
+    `.babel/handoff.json` that the repository's own `.babel/` files do not
+    produce, with a constraint id those files never contained. Anyone who ran
+    the advertised command would have seen a PASS.
+    """
+    import io
+    import os
+    from contextlib import redirect_stdout
+
+    from babelci.cli import main
+
+    checked = 0
+    previous = os.getcwd()
+    os.chdir(ROOT)
+    try:
+        for path in sorted((ROOT / "launch").glob("*.md")):
+            text = path.read_text(encoding="utf-8")
+            for argv, expected in _indented_console_blocks(text):
+                buffer = io.StringIO()
+                with redirect_stdout(buffer):
+                    main(argv)
+                actual = [line.rstrip()
+                          for line in buffer.getvalue().split("\n")
+                          if line.strip()]
+                for line in expected:
+                    assert line in actual, (
+                        f"{path.name} shows a line that "
+                        f"`babelci {' '.join(argv)}` does not print:\n"
+                        f"  {line}")
+                checked += 1
+    finally:
+        os.chdir(previous)
+    assert checked >= 2, (
+        f"only {checked} launch console blocks were verifiable; the launch "
+        f"copy must not become unasserted again")
+
+
 def test_no_url_points_at_a_repository_that_does_not_exist():
     """Metadata that 404s is worse than metadata that is absent.
 
