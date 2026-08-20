@@ -34,6 +34,59 @@ def test_clean_handoff_does_not_claim_external_truth():
         finding["code"] for finding in result["findings"]}
 
 
+def test_handoff_without_a_declared_authority_does_not_claim_agreement():
+    """The verifier agreeing with itself is a self-check, not agreement.
+
+    Both of this tool's encoders are this tool's. With no producer-side
+    commitment to compare against, nothing independent examined the artifact,
+    and the layer must say so in the same word it uses for a missing receipt.
+    """
+    handoff = cases.clean()
+    handoff.pop("authorities", None)
+    result = verify(handoff, expectation=cases.expectation())
+    entry = layer(result, contract.LAYER_AUTHORITIES)
+    assert entry["status"] != VERIFIED
+    assert entry["status"] == NOT_ESTABLISHED
+    assert contract.AUTHORITY_SINGLE_ENCODING in {
+        finding["code"] for finding in result["findings"]}
+
+
+def test_an_unestablished_authority_layer_does_not_fail_the_run():
+    """`not established` is an unexamined layer, not a defect.
+
+    This is the compatibility guarantee: an artifact that never declared an
+    authority keeps passing and keeps its exit code. Only the word changes.
+    """
+    handoff = cases.clean()
+    handoff.pop("authorities", None)
+    result = verify(handoff, expectation=cases.expectation())
+    assert result["verdict"] == "PASS"
+    assert not codes(result)
+
+
+def test_a_declared_authority_still_verifies_the_layer():
+    """Producers that do the stronger thing keep the stronger result."""
+    result = verify(cases.clean(), expectation=cases.expectation())
+    entry = layer(result, contract.LAYER_AUTHORITIES)
+    assert entry["status"] == VERIFIED
+    assert contract.AUTHORITY_SINGLE_ENCODING not in {
+        finding["code"] for finding in result["findings"]}
+
+
+def test_authority_disagreement_stays_failed_and_is_not_softened():
+    """A real disagreement must not be downgraded to merely unexamined.
+
+    `authority-disagreement` declares no authorities either, so it reaches the
+    same branch. Silence and contradiction are different findings and the
+    guard that separates them is load-bearing.
+    """
+    result = verify(cases.build("authority-disagreement"),
+                    expectation=cases.expectation())
+    entry = layer(result, contract.LAYER_AUTHORITIES)
+    assert entry["status"] == FAILED
+    assert contract.AUTHORITY_DISAGREEMENT in codes(result)
+
+
 def test_every_layer_reports_a_status():
     result = verify(cases.clean(), expectation=cases.expectation())
     assert [entry["layer"] for entry in result["layers"]] == list(contract.LAYERS)

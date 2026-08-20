@@ -280,15 +280,18 @@ def verify(handoff: Any, *, expectation: dict[str, Any] | None = None,
                             "world this artifact does not encode",
                             expected=world_digest, received=entry["world_digest"])
     # The verifier's own two encodings are genuinely independent of each other,
-    # so a passing check here is a real result. It is a weaker result than a
-    # producer computing the world with its own encoder and committing to it,
-    # and the note says so rather than letting green imply the stronger claim.
+    # but both of them are this tool's. Agreeing with itself is a self-check,
+    # not an outside opinion, and reporting it as `verified` would let the
+    # verifier mark its own homework -- the one thing this layer exists to
+    # prevent. With no producer-side commitment to compare against, the layer
+    # has not been established, for exactly the reason `external truth` has not
+    # been when no receipt is supplied. Same condition, so the same word for it.
     distinct = {entry["encoding"] for entry in declared_authorities}
     if not distinct and layers.state[LAYER_AUTHORITIES] == VERIFIED:
-        layers.fail(LAYER_AUTHORITIES, AUTHORITY_SINGLE_ENCODING,
-                    "this verifier's two encodings agree; the producer declared no "
-                    "independently computed commitment to compare against",
-                    severity=SEVERITY_NOTE)
+        layers.unestablished(
+            LAYER_AUTHORITIES, AUTHORITY_SINGLE_ENCODING,
+            "this verifier's two encodings agree; the producer declared no "
+            "independently computed commitment to compare against")
     if layers.state[LAYER_AUTHORITIES] == VERIFIED:
         layers.note(LAYER_AUTHORITIES,
                     f"{len(distinct) + 2} encodings agree")

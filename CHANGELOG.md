@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- The `authority agreement` layer now reports `not established` when the
+  producer declared no authority, instead of `verified`. 0.1.0 printed
+  `verified   2 encodings agree` on an artifact whose producer declared
+  nothing — those two encodings were the verifier's own, agreeing with
+  itself. That is a self-check, and reporting it in the same word used for
+  an independently corroborated layer overstated what had been examined.
+  This is the same condition `external truth` already reported honestly, so
+  it now uses the same word.
+
+  No verdict or exit code changes: `not established` has never been a
+  failure. Artifacts that declare an authority are unaffected, including
+  every example in this repository and this project's own handoff.
+
 ## 0.1.0 — 2026-08-11
 
 Published to [PyPI](https://pypi.org/project/babel-context-integrity/0.1.0/)

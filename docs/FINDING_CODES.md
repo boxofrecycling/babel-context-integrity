@@ -167,9 +167,10 @@ authority computed it over something else.
 
 ### `AUTHORITY_SINGLE_ENCODING` — severity `note`
 This verifier's own two encoders agreed, but the producer declared no
-independently computed commitment to compare against. Does not fail the run.
-It is here so a green authority layer does not imply the stronger property of
-producer-side independence.
+independently computed commitment to compare against, so the layer reports
+`not established`. Does not fail the run. The verifier agreeing with itself is
+a self-check, and calling it `verified` would imply the stronger property of
+producer-side independence — which nothing here established.
 
 ---
 
