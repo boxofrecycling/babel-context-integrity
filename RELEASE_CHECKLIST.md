@@ -15,6 +15,15 @@ unpushed; no tag exists and no archive has been built.
 - [x] `action@v0.2.0` references updated in `README.md` and `docs/CI.md`.
       These resolve once the tag exists, same as `@v0.1.0` did before its tag.
 - [x] 142 tests pass; `babelci lab` 15/15; `action/test-local.sh` 11/11
+- [x] Claim audit re-run against `docs/LIMITS.md` for the four new visible
+      surfaces — `SILENCE_UNATTESTED`, `PROVENANCE_ROOT_MISMATCH`, the coverage
+      census, `babelci carry` — recorded in `docs/CLAIM_AUDIT.md`. All clean;
+      two things stated rather than fixed, both noted there.
+- [x] Disclosed: the v0.2.0 reporting changes regenerated the console blocks in
+      `launch/github-release.md` and `launch/show-hn.md`, which are v0.1.0
+      drafts. `test_launch_copy_console_output_matches_the_real_command`
+      requires it. `release/v0.1.0-notes.md` is deliberately unchanged.
+      Reasoning in `docs/CLAIM_AUDIT.md`.
 
 ### Needs a human
 
@@ -22,7 +31,8 @@ unpushed; no tag exists and no archive has been built.
 - [ ] Decide whether to merge the branch to `main` before tagging.
 - [ ] `rm -rf dist && python -m build && python -m twine check dist/*`, then
       record the digests — `release/DIGESTS.txt` still describes v0.1.0 only.
-- [ ] Disclosure scan on the working tree **and** both archives.
+- [ ] Disclosure scan on the working tree **and** both archives
+      (`docs/DISCLOSURE_AUDIT.md` records the v0.1.0 scan only).
 - [ ] `git tag -a v0.2.0`, push branch and tag, then
       `gh release create v0.2.0 --notes-file release/v0.2.0-notes.md`.
 - [ ] TestPyPI, install into a clean venv, run `babelci demo`, then PyPI.

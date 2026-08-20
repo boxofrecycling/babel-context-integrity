@@ -6,6 +6,16 @@ these files are the text written to announce them.
 
 This directory is not a record of which announcements were posted, or when.
 
+**These drafts were written for v0.1.0, and their console blocks are kept
+current rather than historical.** `test_docs.py` runs every `$ babelci` block in
+this directory against the build in the working tree and requires it to match,
+so a release that changes what the tool prints changes these files too — v0.2.0
+did, adding the coverage census and the `conflicts` open-issue count. Prepared
+copy that advertises output the tool no longer prints is the defect that test
+was written to prevent, and these drafts are unpublished. If you announce v0.1.0
+specifically, take the console blocks from `release/v0.1.0-notes.md`, which is
+the release record and is deliberately not regenerated.
+
 | File | For |
 |---|---|
 | [`github-release.md`](github-release.md) | the v0.1.0 release notes |
@@ -51,8 +61,9 @@ separation is the *limitation* rather than the feature.
 `revolutionary` · `solves AI memory` · `guarantees correctness` · `first ever` ·
 `game-changing` · `eliminates hallucinations` · `10x` · `paradigm shift`
 
-`tests/test_docs.py` blocks several of these in the repository docs. The launch
-copy is not tested; that is what this list is for.
+`tests/test_docs.py` blocks several of these in the repository docs. In this
+directory only the console blocks are mechanically checked — the prose, its tone
+and its framing are not, and that is what this list is for.
 
 ## Claims that are safe to make
 

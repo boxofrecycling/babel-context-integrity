@@ -106,6 +106,86 @@ Both now use the real invocation and its real output, and
 `.babel/` paths deliberately, since those stand in for a user's own project;
 that skip is what let the launch drafts drift.
 
+## v0.2.0 surfaces — audited 2026-08-20
+
+The audit above was performed at the v0.1.0 freeze. v0.2.0 adds four externally
+visible surfaces. Each was audited against the same rule, and the surfaces
+inherited from v0.1.0 were re-checked for sentences the new behaviour makes
+inaccurate.
+
+| Surface | Visible strings | Result |
+|---|---|---|
+| `SILENCE_UNATTESTED` | finding detail; `conflicts` detail `none, 0 open (unattested)`; `FINDING_CODES.md` entry | clean |
+| `PROVENANCE_ROOT_MISMATCH` | finding detail; `FINDING_CODES.md` entry; extended `LAYER_MEANING[provenance]` | clean |
+| coverage census | one line under the verdict | clean |
+| `babelci carry` | CLI help; `docs/CLI.md`; the withheld-field table | clean, with one thing stated below |
+| `README.md`, `docs/*.md`, `site/index.html`, `launch/*.md` (re-check) | regenerated console blocks | clean; see the disclosure below |
+
+**`SILENCE_UNATTESTED` reduces the claim surface rather than adding to it.** It
+exists to stop `none` being read as a completed check. Its detail says the
+producer's claim "was not checked here" — a disclaimer, not an assertion.
+
+**`PROVENANCE_ROOT_MISMATCH` states a string comparison and nothing more.** The
+detail is `expected facts to trace to authority root X, artifact grounds them
+in Y`. A match establishes that the artifact names the root the repository
+expected. It does not establish that the root is real or trustworthy, which is
+[`LIMITS.md`](LIMITS.md) item 3 and is unchanged. The extended
+`LAYER_MEANING[provenance]` adds only "and that root is the one the expectation
+required when it named one" — a statement about the expectation, not about the
+world.
+
+**The census was the one surface with a real risk, and it was considered.** A
+figure printed under a verdict invites reading as a score, and a score is how a
+verifier becomes a rubber stamp — the failure the eight separate layers exist to
+avoid. It prints counts side by side and never combines them; there is no
+percentage, no ratio and no total quality figure.
+`test_the_census_counts_layers_and_never_averages_them` asserts that the output
+contains neither `%` nor the word `score`. Verdict: clean, and the guard is
+mechanical rather than editorial.
+
+**One thing worth stating about `carry`.** With v0.2.0 Babel *produces*
+artifacts as well as checking them, for the first time. Nothing about Babel
+having written an artifact makes its contents true, and `carry` copies what a
+predecessor asserted: a wrong predecessor yields a faithfully wrong successor.
+The withheld fields exist so that it cannot do worse than that — it will not
+carry an `authorities` entry, an `external_receipt` or a `summary`, because each
+would assert something the successor's producer never claimed. This is stated in
+[`CLI.md`](CLI.md), in the release notes and in the module docstring. It is
+recorded here because "the tool wrote it" is exactly the kind of unearned
+authority this audit exists to catch, and it is a new category of risk that the
+v0.1.0 audit had no reason to consider.
+
+**Noted, not fixed.** The rationale prose for `carry` in `CLI.md` and
+`CHANGELOG.md` says that constraints retyped every session "eventually" get
+retyped wrong. That is an unmeasured generalisation about producer behaviour.
+It is not one of the seven banned implications and it is rationale rather than a
+claim about what Babel establishes, but it is the kind of sentence
+[`../launch/README.md`](../launch/README.md) would not allow in announcement
+copy, and it should not migrate there.
+
+## Launch drafts regenerated at v0.2.0 — disclosure
+
+The v0.2.0 reporting changes altered lines that appear inside console blocks in
+`launch/github-release.md` and `launch/show-hn.md`. Those two files are **v0.1.0
+announcement drafts**, and their blocks now show v0.2.0 output: a census line,
+and `conflicts ... none, 1 open` in place of `none`.
+
+This was not an edit of a historical record. It is what
+`test_launch_copy_console_output_matches_the_real_command` enforces — every
+`$ babelci` block in `launch/` is run against the current build and must match.
+That test exists because these drafts drifted once before, described in the
+section above. Neither draft has been published; they are prepared copy, and
+prepared copy that shows output the tool no longer prints is the defect the test
+was written to prevent.
+
+The consequence is recorded rather than hidden: **three documents describe
+v0.1.0 and two of them now show v0.2.0 output.**
+[`../release/v0.1.0-notes.md`](../release/v0.1.0-notes.md) is the published
+release record, is not scanned by any test, and is deliberately unchanged — it
+shows what v0.1.0 actually printed. If the launch drafts are ever used to
+announce v0.1.0 specifically, their console blocks no longer match that release
+and must be taken from the v0.1.0 notes instead.
+
 ## What this audit does not cover
 
 Prose in launch copy is still unasserted for tone and framing —

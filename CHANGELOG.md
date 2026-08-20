@@ -3,8 +3,13 @@
 ## 0.2.0 — 2026-08-20
 
 Babel became more truthful about three things: what it verified, what nobody
-attested, and what legitimately carries forward. No artifact format changed and
-no run changes verdict.
+attested, and what legitimately carries forward.
+
+No artifact format changed, and nothing checked during this release changed its
+verdict or exit code. One newly enforced check *can* change a verdict on future
+artifacts: `PROVENANCE_ROOT_MISMATCH` fails a run when an expectation names an
+`authority_root` the artifact does not match. Nothing enforces it until a
+repository opts in by writing that key.
 
 Every change here came from running the verifier against a real handoff that
 had been carried across sixty-five sessions, and reading what it printed.
@@ -79,12 +84,17 @@ had been carried across sixty-five sessions, and reading what it printed.
 
 Nothing to do. No artifact needs changing and no configuration needs adding.
 
-- **Exit codes are unchanged for every artifact that exists.** `not established`
-  has never been a failure, and `SILENCE_UNATTESTED` is `note` severity, which
-  does not set a layer state. The new `PROVENANCE_ROOT_MISMATCH` is the only
-  check that can fail a run, and only when an expectation names an
-  `authority_root` — a key no expectation outside this repository's own
-  examples currently sets.
+- **Exit codes are unchanged for everything checked during this release.**
+  `not established` has never been a failure, and `SILENCE_UNATTESTED` is `note`
+  severity, which does not set a layer state. The new
+  `PROVENANCE_ROOT_MISMATCH` is the only check that can fail a run, and only
+  when an expectation names an `authority_root`.
+
+  What was checked: every artifact, expectation and generated lab case in this
+  repository, and one external project using Babel in production. None changed
+  verdict. Expectation files elsewhere were not surveyed — if yours names an
+  `authority_root`, confirm the artifact grounds its facts in that root before
+  upgrading.
 - **Output changed for artifacts that declare no `authorities`.** One status
   line becomes `not established`, and a census line appears. Anything parsing
   the human-readable output should read `--json` instead, where
@@ -98,8 +108,14 @@ Nothing to do. No artifact needs changing and no configuration needs adding.
 
 Contract version is unchanged at `0.1`. No field was added or removed, no digest
 recipe or canonical encoding changed, no existing finding code changed meaning,
-and no diff rule changed verdict. Artifacts sealed by 0.1.0 verify identically
-under 0.2.0, and artifacts produced by 0.2.0 verify identically under 0.1.0.
+and no diff rule changed verdict.
+
+An artifact sealed by 0.1.0 reaches the **same verdict and exit code** under
+0.2.0, and an artifact produced by 0.2.0 reaches the same verdict and exit code
+under 0.1.0. Both directions were run rather than assumed. The *reporting*
+differs in both directions: 0.2.0 prints the census, the `conflicts` open-issue
+count, and `not established` where 0.1.0 printed `verified` on the authority
+layer. Output is not part of the compatibility guarantee; `--json` is.
 
 One judgement call worth stating plainly: `docs/COMPATIBILITY.md` lists
 "changes what a layer status implies" as breaking. The `authority agreement`
