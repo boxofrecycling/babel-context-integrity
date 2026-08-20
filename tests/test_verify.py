@@ -87,6 +87,70 @@ def test_authority_disagreement_stays_failed_and_is_not_softened():
     assert contract.AUTHORITY_DISAGREEMENT in codes(result)
 
 
+def test_expected_authority_root_that_matches_verifies_provenance():
+    """The repository named a root and the artifact grounds its facts there."""
+    expectation = cases.expectation()
+    assert expectation.get("authority_root") is not None, "fixture lost its root"
+    result = verify(cases.clean(), expectation=expectation)
+    assert layer(result, contract.LAYER_PROVENANCE)["status"] == VERIFIED
+    assert contract.PROVENANCE_ROOT_MISMATCH not in codes(result)
+
+
+def test_expected_authority_root_that_differs_fails_provenance():
+    """A chain drawn to the wrong root is a chain to the wrong root.
+
+    Every other check in this layer asks whether the artifact reaches the root
+    it chose for itself. Only the expectation can say that root was the one
+    the repository meant.
+    """
+    handoff = cases.clean()
+    actual_root = handoff["provenance"]["authority_root"]
+    expectation = {**cases.expectation(), "authority_root": "repo@deadbeef"}
+    result = verify(handoff, expectation=expectation)
+
+    assert result["verdict"] == "FAIL"
+    assert layer(result, contract.LAYER_PROVENANCE)["status"] == FAILED
+    assert contract.PROVENANCE_ROOT_MISMATCH in codes(result)
+    finding = next(item for item in result["findings"]
+                   if item["code"] == contract.PROVENANCE_ROOT_MISMATCH)
+    assert finding["expected"] == "repo@deadbeef"
+    assert finding["received"] == actual_root
+
+
+def test_root_enforcement_does_not_disturb_the_authority_layer():
+    """C1 and C2 answer different questions about different fields.
+
+    Enforcing which root the facts hang from says nothing about whether an
+    independent encoder agreed, so the authority layer must still report
+    `not established` when the producer declared none.
+    """
+    handoff = cases.clean()
+    handoff.pop("authorities", None)
+    result = verify(handoff, expectation=cases.expectation())
+    assert layer(result, contract.LAYER_AUTHORITIES)["status"] == NOT_ESTABLISHED
+    assert layer(result, contract.LAYER_PROVENANCE)["status"] == VERIFIED
+    assert result["verdict"] == "PASS"
+
+
+def test_an_expectation_that_names_no_root_is_unaffected():
+    """The compatibility guarantee for every expectation file written so far.
+
+    Projects whose expectation predates this check -- Lantern's among them --
+    must keep the behaviour they had. Silence is not a wildcard the verifier
+    fills in; it is a question the repository has not answered.
+    """
+    without_root = {key: value for key, value in cases.expectation().items()
+                    if key != "authority_root"}
+    result = verify(cases.clean(), expectation=without_root)
+    assert result["verdict"] == "PASS"
+    assert layer(result, contract.LAYER_PROVENANCE)["status"] == VERIFIED
+    assert contract.PROVENANCE_ROOT_MISMATCH not in codes(result)
+
+    unexpecting = verify(cases.clean())
+    assert unexpecting["verdict"] == "PASS"
+    assert contract.PROVENANCE_ROOT_MISMATCH not in codes(unexpecting)
+
+
 def test_every_layer_reports_a_status():
     result = verify(cases.clean(), expectation=cases.expectation())
     assert [entry["layer"] for entry in result["layers"]] == list(contract.LAYERS)

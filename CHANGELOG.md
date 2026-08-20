@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Added
+
+- `PROVENANCE_ROOT_MISMATCH`. The `provenance` layer now checks the artifact's
+  `authority_root` against the one the expectation names. Every other check in
+  that layer asks whether an artifact reaches the root it chose for itself;
+  only the repository can say that root was the right one to choose. The
+  expectation file has carried an `authority_root` key since 0.1.0 and the
+  verifier never read it — it was documentation of a check that did not exist.
+
+  Enforced only when the expectation names a root. An expectation without the
+  key behaves exactly as it did, so no repository written against 0.1.0
+  changes verdict. Silence is a question the repository has not answered, not
+  a wildcard the verifier fills in.
+
 ### Changed
 
 - The `authority agreement` layer now reports `not established` when the

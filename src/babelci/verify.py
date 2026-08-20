@@ -30,7 +30,7 @@ from .contract import (
     LAYER_CONFLICTS, LAYER_CONSTRAINTS, LAYER_EXTERNAL, LAYER_IDENTITY,
     LAYER_PROVENANCE, LAYER_STRUCTURE, PROVENANCE_CHAIN_BROKEN, PROVENANCE_CYCLE,
     PRODUCER_IDENTITY_MISMATCH, PROVENANCE_EDGE_DANGLING,
-    PROVENANCE_ROOT_UNDECLARED,
+    PROVENANCE_ROOT_MISMATCH, PROVENANCE_ROOT_UNDECLARED,
     REQUIRED_DECISION_MISSING, REQUIRED_OBJECT_MISSING,
     RETAINED_CONSTRAINT_MISSING,
     RETAINED_CONSTRAINT_MODIFIED,
@@ -186,7 +186,7 @@ def verify(handoff: Any, *, expectation: dict[str, Any] | None = None,
 
     # -- layer 4: provenance ------------------------------------------------
     layers.open(LAYER_PROVENANCE)
-    _check_provenance(handoff, layers)
+    _check_provenance(handoff, layers, expectation)
 
     # -- layer 5: retained constraints --------------------------------------
     layers.open(LAYER_CONSTRAINTS)
@@ -337,16 +337,33 @@ def verify(handoff: Any, *, expectation: dict[str, Any] | None = None,
 
 # ---------------------------------------------------------------------------
 
-def _check_provenance(handoff: dict[str, Any], layers: _Layers) -> None:
+def _check_provenance(handoff: dict[str, Any], layers: _Layers,
+                      expectation: dict[str, Any] | None = None) -> None:
     """Check that every asserted object traces to the declared authority root.
 
     Provenance nodes are opaque source labels -- ``ci/run-9981``, ``query/db``,
     a commit id. They are not object ids. An object names one source label; the
     edge list says how that label reaches the root.
+
+    When the expectation names an ``authority_root``, the root the artifact
+    declares must be that one. Everything else in this layer checks the chain
+    an artifact draws to its own root, which says nothing about whether that
+    root is the right one to have drawn it to.
     """
     provenance = handoff["provenance"]
     root = provenance["authority_root"]
     edges = [(edge[0], edge[1]) for edge in provenance["edges"]]
+
+    # The repository, not the producing agent, is the authority on what facts
+    # are supposed to be grounded in -- the same asymmetry the expectation file
+    # exists for. Checked only when the expectation names a root, so a project
+    # that has not decided keeps exactly the behaviour it had.
+    expected_root = (expectation or {}).get("authority_root")
+    if expected_root is not None and expected_root != root:
+        layers.fail(LAYER_PROVENANCE, PROVENANCE_ROOT_MISMATCH,
+                    f"expected facts to trace to authority root "
+                    f"{expected_root!r}, artifact grounds them in {root!r}",
+                    expected=expected_root, received=root)
 
     aliases = handoff.get("aliases", []) or []
     alias_names = [pair[0] for pair in aliases]

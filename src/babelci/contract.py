@@ -58,7 +58,8 @@ LAYER_MEANING = {
         "artifact actually carries.",
     LAYER_PROVENANCE:
         "Every asserted object traces to the declared authority root through "
-        "connected, acyclic edges.",
+        "connected, acyclic edges, and that root is the one the expectation "
+        "required when it named one.",
     LAYER_CONSTRAINTS:
         "Constraints the producer marked as surviving the handoff are still "
         "present and unmodified.",
@@ -98,6 +99,7 @@ CHECKPOINT_REPLAY = "CHECKPOINT_REPLAY"
 
 # provenance
 PROVENANCE_ROOT_UNDECLARED = "PROVENANCE_ROOT_UNDECLARED"
+PROVENANCE_ROOT_MISMATCH = "PROVENANCE_ROOT_MISMATCH"
 PROVENANCE_EDGE_DANGLING = "PROVENANCE_EDGE_DANGLING"
 PROVENANCE_CHAIN_BROKEN = "PROVENANCE_CHAIN_BROKEN"
 PROVENANCE_CYCLE = "PROVENANCE_CYCLE"

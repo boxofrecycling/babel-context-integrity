@@ -70,6 +70,12 @@ the same as current.
 No provenance edge reaches the declared `authority_root`, so nothing in the
 handoff is grounded in anything.
 
+### `PROVENANCE_ROOT_MISMATCH`
+The artifact grounds its facts in a different `authority_root` than the
+expectation named. Emitted only when the expectation names one. The rest of
+this layer checks the chain an artifact draws to its own root, which says
+nothing about whether that is the root the repository meant.
+
 ### `PROVENANCE_EDGE_DANGLING`
 An edge ends at a node that is neither the root nor has an onward edge. The
 chain hangs in mid-air.
