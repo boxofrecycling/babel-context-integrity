@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "babel-context-integrity"
-version = "0.1.0"
+version = "0.2.0"
 description = "Verify what survives when one AI agent hands work to the next."
 readme = "README.md"
 requires-python = ">=3.10"

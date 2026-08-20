@@ -38,7 +38,7 @@ Pin the version in CI:
 
 ```yaml
 with:
-  version: "babel-context-integrity==0.1.0"
+  version: "babel-context-integrity==0.2.0"
 ```
 
 ## Compatibility rules
@@ -55,7 +55,34 @@ A change is **breaking** and requires a new contract version if it:
 - changes a digest recipe or the canonical encoding;
 - changes what an existing finding code means;
 - changes a diff rule's verdict;
-- changes what a layer status implies.
+- changes what a layer status implies **about the artifact**.
+
+## Contract compatibility vs report compatibility
+
+Those two lists are about the contract: what an artifact *is*, and whether two
+implementations agree about it. A separate question is what the tool *prints*,
+and the two can move independently.
+
+The tool may tighten what it is willing to claim without any artifact changing.
+That is not a contract change: the same bytes parse the same way, produce the
+same digests, and reach the same verdict and exit code. It is still a change
+someone can notice, so it belongs in the changelog and in release notes, stated
+plainly rather than left to be discovered.
+
+0.2.0 is the worked example. The `authority agreement` layer stopped reporting
+`verified` for an artifact whose producer declared no authority, because those
+two agreeing encodings were the verifier's own. The word on one status line
+changed; nothing about the artifact did, and no run changed verdict. Read
+strictly, "changes what a layer status implies" could have been read as
+breaking — hence the clarification above. A status now implying *more* than it
+did, with no artifact and no verdict affected, is a report change.
+
+The rule of thumb: if an artifact sealed by the old version still verifies
+identically under the new one, and vice versa, the contract did not move.
+
+If you parse Babel's output, parse `--json`. `layers[].status` has carried this
+information since 0.1.0 and is subject to the compatibility rules above; the
+human-readable rendering is not.
 
 Since a v0.1 verifier refuses non-v0.1 artifacts outright, a breaking change is
 loud by construction. That is the intended cost.

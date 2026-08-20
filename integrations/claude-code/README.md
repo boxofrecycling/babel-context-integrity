@@ -71,7 +71,7 @@ The constraints arrive as constraints rather than as a paragraph.
 ## 4. Refuse silent reversals in CI
 
 ```yaml
-- uses: boxofrecycling/babel-context-integrity/action@v0.1.0
+- uses: boxofrecycling/babel-context-integrity/action@v0.2.0
   with:
     handoff: .babel/handoff.json
     against: .babel/handoff-previous.json

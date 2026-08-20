@@ -7,5 +7,5 @@ credential handling and no telemetry. Everything it concludes is derived from
 the artifact you give it.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __all__ = ["__version__"]

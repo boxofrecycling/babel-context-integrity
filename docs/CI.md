@@ -22,7 +22,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - uses: boxofrecycling/babel-context-integrity/action@v0.1.0
+      - uses: boxofrecycling/babel-context-integrity/action@v0.2.0
         with:
           handoff: .babel/handoff.json
           expect: .babel/expect.json
@@ -35,7 +35,7 @@ produces a perfectly consistent handoff; only comparing it to the previous one
 shows the reversal. Supply `against:` to run `babelci diff` as well.
 
 ```yaml
-      - uses: boxofrecycling/babel-context-integrity/action@v0.1.0
+      - uses: boxofrecycling/babel-context-integrity/action@v0.2.0
         with:
           handoff: .babel/handoff.json
           against: .babel/handoff-previous.json
@@ -53,7 +53,7 @@ shows the reversal. Supply `against:` to run `babelci diff` as well.
 | `against` | *(none)* | predecessor artifact to diff against |
 | `strict` | `false` | treat a diff `REVIEW` as a failure |
 | `json-report` | *(none)* | write machine-readable results here |
-| `version` | `babel-context-integrity==0.1.0` | pin the CLI version |
+| `version` | `babel-context-integrity==0.2.0` | pin the CLI version |
 
 ## Outputs
 
@@ -141,7 +141,7 @@ CLI never needs the network after install.
 There is nothing GitHub-specific in the tool. Anywhere you can run a command:
 
 ```bash
-pip install babel-context-integrity==0.1.0
+pip install babel-context-integrity==0.2.0
 babelci verify .babel/handoff.json --expect .babel/expect.json
 ```
 
@@ -151,7 +151,7 @@ GitLab:
 handoff-integrity:
   image: python:3.12-slim
   script:
-    - pip install babel-context-integrity==0.1.0
+    - pip install babel-context-integrity==0.2.0
     - babelci verify .babel/handoff.json --expect .babel/expect.json
 ```
 

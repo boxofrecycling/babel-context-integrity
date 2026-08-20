@@ -141,5 +141,5 @@ deployed in production yet is not worth sitting on.
   package itself.
 - `pytest` and `jsonschema` are development-only and are not in the wheel.
 - The wheel contains `babelci/` and the JSON Schema. Nothing else.
-- Pin the version in CI: `babel-context-integrity==0.1.0`.
+- Pin the version in CI: `babel-context-integrity==0.2.0`.
 - Distribution digests for each release are recorded in `release/DIGESTS.txt`.

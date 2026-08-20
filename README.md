@@ -240,7 +240,7 @@ Rules: [docs/DIFF_RULES.md](docs/DIFF_RULES.md).
 ## GitHub Action
 
 ```yaml
-- uses: boxofrecycling/babel-context-integrity/action@v0.1.0
+- uses: boxofrecycling/babel-context-integrity/action@v0.2.0
   with:
     handoff: .babel/handoff.json
     expect: .babel/expect.json

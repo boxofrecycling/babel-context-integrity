@@ -1,3 +1,39 @@
+# Release checklists
+
+## v0.2.0 — prepared, not published
+
+Nothing below has been done. The working tree is prepared and the branch is
+unpushed; no tag exists and no archive has been built.
+
+### Prepared
+
+- [x] `CHANGELOG.md` — 0.2.0 entry with migration, compatibility, limitations
+- [x] `release/v0.2.0-notes.md` — GitHub release body
+- [x] `docs/COMPATIBILITY.md` — contract vs report compatibility
+- [x] Version bumped to `0.2.0`: `pyproject.toml`, `src/babelci/__init__.py`,
+      `CITATION.cff`, `action/action.yml` default pin, docs pin examples
+- [x] `action@v0.2.0` references updated in `README.md` and `docs/CI.md`.
+      These resolve once the tag exists, same as `@v0.1.0` did before its tag.
+- [x] 142 tests pass; `babelci lab` 15/15; `action/test-local.sh` 11/11
+
+### Needs a human
+
+- [ ] Review the release text. Nothing here has been reviewed by anyone.
+- [ ] Decide whether to merge the branch to `main` before tagging.
+- [ ] `rm -rf dist && python -m build && python -m twine check dist/*`, then
+      record the digests — `release/DIGESTS.txt` still describes v0.1.0 only.
+- [ ] Disclosure scan on the working tree **and** both archives.
+- [ ] `git tag -a v0.2.0`, push branch and tag, then
+      `gh release create v0.2.0 --notes-file release/v0.2.0-notes.md`.
+- [ ] TestPyPI, install into a clean venv, run `babelci demo`, then PyPI.
+- [ ] Decide whether 0.2.0 warrants any announcement. It is a point release;
+      the `launch/` drafts were written for v0.1.0 and should not be reused
+      without rereading them.
+
+Steps up to and including the tag are reversible. Pushing is not.
+
+---
+
 # Release checklist — v0.1.0
 
 Everything above the line is done. Everything below it needs a human, and

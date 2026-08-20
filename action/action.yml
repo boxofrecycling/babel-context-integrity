@@ -39,7 +39,7 @@ inputs:
     description: >-
       Version specifier for babel-context-integrity. Pin this in production.
     required: false
-    default: "babel-context-integrity==0.1.0"
+    default: "babel-context-integrity==0.2.0"
 
 outputs:
   verdict:
