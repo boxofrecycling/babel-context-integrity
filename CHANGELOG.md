@@ -4,6 +4,24 @@
 
 ### Added
 
+- `babelci carry`. Drafts the successor of a handoff: the task, provenance
+  graph, authority root, retained constraints, decisions, open issues, objects
+  and aliases carry forward verbatim, and the checkpoint advances declaring its
+  predecessor as `parent_checkpoint_id`. Producers currently retype this at the
+  end of a session, when context is shortest, and what gets retyped eventually
+  gets retyped wrong.
+
+  It withholds three fields. `authorities` is a commitment its producer
+  computed over its own world, and the successor's producer has computed
+  nothing — carrying one would invent authority data, so the successor's
+  authority layer reports `not established` until it declares its own.
+  `external_receipt` accepted the predecessor's world, not this one. `summary`
+  asserts what is true now, and carrying it into a new checkpoint would recommit
+  to a stale claim; `--summary` writes a fresh one.
+
+  Additive. No existing command changes behaviour, and `carry` invents nothing:
+  an authority root of `repo` stays `repo`.
+
 - `PROVENANCE_ROOT_MISMATCH`. The `provenance` layer now checks the artifact's
   `authority_root` against the one the expectation names. Every other check in
   that layer asks whether an artifact reaches the root it chose for itself;

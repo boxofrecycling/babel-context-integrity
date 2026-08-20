@@ -23,7 +23,8 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from . import __version__, authorities, diff as diff_module, render, seal as seal_module
+from . import (__version__, authorities, carry as carry_module,
+               diff as diff_module, render, seal as seal_module)
 from .contract import (
     EXIT_FAIL, EXIT_OK, EXIT_REVIEW, EXIT_USAGE, LAYER_MEANING, REFUSE, REVIEW,
 )
@@ -103,6 +104,24 @@ def cmd_seal(args: argparse.Namespace) -> int:
         print(f"sealed {args.handoff}")
     else:
         sys.stdout.write(text)
+    return EXIT_OK
+
+
+def cmd_carry(args: argparse.Namespace) -> int:
+    predecessor = _load(args.handoff)
+    try:
+        successor = carry_module.carry(
+            predecessor,
+            checkpoint_id=args.checkpoint,
+            handoff_id=args.handoff_id,
+            producer=args.producer,
+            consumer=args.consumer,
+            summary=args.summary)
+    except (KeyError, TypeError, ValueError) as error:
+        return _usage_error(f"cannot carry {args.handoff}: {error}")
+    sys.stdout.write(
+        json.dumps(successor, indent=2, sort_keys=True, ensure_ascii=False)
+        + "\n")
     return EXIT_OK
 
 
@@ -195,6 +214,23 @@ def build_parser() -> argparse.ArgumentParser:
     seal_parser.add_argument("--declare-authority", metavar="ID",
                              help="record this build's world commitment under ID")
     seal_parser.set_defaults(func=cmd_seal)
+
+    carry_parser = subparsers.add_parser(
+        "carry", help="draft the successor of a handoff, carrying it forward")
+    carry_parser.add_argument("handoff")
+    carry_parser.add_argument("--checkpoint", required=True, metavar="ID",
+                              help="checkpoint id the successor declares")
+    carry_parser.add_argument("--handoff-id", dest="handoff_id", metavar="ID",
+                              help="successor handoff id (default: --checkpoint)")
+    carry_parser.add_argument("--producer", metavar="AGENT",
+                              help="successor's producer "
+                                   "(default: the predecessor's consumer)")
+    carry_parser.add_argument("--consumer", metavar="AGENT",
+                              help="who the successor will hand to")
+    carry_parser.add_argument("--summary", metavar="TEXT",
+                              help="prose for the successor; the predecessor's "
+                                   "is never carried")
+    carry_parser.set_defaults(func=cmd_carry)
 
     schema_parser = subparsers.add_parser(
         "schema", help="print the normative JSON Schema")

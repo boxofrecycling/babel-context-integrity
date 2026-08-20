@@ -120,6 +120,43 @@ REFUSE
 `-v` adds the rule's reasoning and the before/after values.
 `--strict` makes `REVIEW` exit 3 instead of 0.
 
+## `babelci carry`
+
+```
+babelci carry HANDOFF.json --checkpoint ID [--handoff-id ID]
+                           [--producer AGENT] [--consumer AGENT]
+                           [--summary TEXT]
+```
+
+Draft the successor of a handoff. The task, the provenance graph and its
+authority root, the retained constraints, the decisions, the open issues, the
+objects and the aliases carry forward verbatim; the checkpoint advances and
+declares its predecessor as `parent_checkpoint_id`; the predecessor's consumer
+becomes the successor's producer unless `--producer` says otherwise.
+
+Continuity is the default because the alternative — retyping the constraints
+every session — eventually retypes them wrong.
+
+Three fields are deliberately **not** carried:
+
+| Field | Why not |
+|---|---|
+| `authorities` | A commitment its producer computed over its own world. The successor's producer has computed nothing, so carrying one would invent authority data. The successor's authority layer reports `not established` until it declares its own. |
+| `external_receipt` | An acceptance of the predecessor's world. Carrying it would launder an old acceptance onto new work. |
+| `summary` | Prose asserting what is true *now*. Carried into a new checkpoint and resealed it becomes a fresh commitment to a stale claim. Write a new one with `--summary`. |
+
+`carry` takes no view on what project facts should say and does not refresh
+them. An authority root of `repo` stays `repo` — upgrading it to something
+more precise would assert a grounding its producer never claimed.
+
+The output is a draft: its checkpoint commitment is a placeholder, so pipe it
+through `seal`.
+
+```bash
+babelci carry .babel/handoff.json --checkpoint cp-12 --consumer next-session \
+  | babelci seal - > next.json
+```
+
 ## `babelci seal`
 
 ```

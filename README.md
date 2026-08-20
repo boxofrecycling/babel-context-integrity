@@ -183,6 +183,7 @@ Full detail: [docs/CONCEPTS.md](docs/CONCEPTS.md).
 babelci verify HANDOFF.json [--expect EXPECT.json] [--json] [-v]
 babelci explain HANDOFF.json          # what each layer establishes, and found
 babelci diff OLD.json NEW.json        # semantic drift, not a line diff
+babelci carry OLD.json --checkpoint ID  # draft the successor
 babelci seal DRAFT.json --in-place    # fill in the commitments
 babelci lab [CASE] [--list] [--json]  # the 15-case failure lab
 babelci demo                          # the walkthrough
