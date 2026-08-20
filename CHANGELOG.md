@@ -4,6 +4,21 @@
 
 ### Added
 
+- A coverage census under the verdict: `7 verified · 1 not established`.
+  Eight mostly-green lines read as eight checks that passed. The census is one
+  line that cannot be skimmed past, and it stays a set of counts printed side
+  by side — never combined — for the same reason the layers themselves are
+  never averaged. After a structural exit it also reports the layers that
+  never ran, so a short report cannot read as a clean one.
+
+- `SILENCE_UNATTESTED`. The contract says silence in `unresolved` is a claim
+  that nothing is open. Nothing checked that claim unless an expectation named
+  an issue that had to survive, and the conflicts layer printed a bare `none`
+  that reads as a completed check. It now reports what it actually knows —
+  `none, 0 open (unattested)`, or `none, 2 open` when the producer named them
+  — and emits a note saying the claim is the producer's alone. Severity `note`:
+  no verdict or exit code changes.
+
 - `babelci carry`. Drafts the successor of a handoff: the task, provenance
   graph, authority root, retained constraints, decisions, open issues, objects
   and aliases carry forward verbatim, and the checkpoint advances declaring its

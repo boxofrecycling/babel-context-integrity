@@ -132,6 +132,72 @@ def test_root_enforcement_does_not_disturb_the_authority_layer():
     assert result["verdict"] == "PASS"
 
 
+def _handoff_declaring_nothing_open():
+    """A clean artifact with an empty `unresolved`, resealed.
+
+    `unresolved` is inside both the checkpoint commitment and the semantic
+    world, so emptying it without resealing and re-declaring the authority
+    fails the checkpoint and authority layers for unrelated reasons.
+    """
+    from babelci.seal import seal
+
+    handoff = cases.clean()
+    handoff["unresolved"] = []
+    return seal(handoff, declare_authority="agent-a")
+
+
+def _expectation_requiring_nothing_open():
+    """The lab expectation minus its `required_unresolved`.
+
+    That key is what attests the silence; a repository that has not written it
+    is the case these tests are about.
+    """
+    return {key: value for key, value in cases.expectation().items()
+            if key != "required_unresolved"}
+
+
+def test_empty_unresolved_is_reported_as_unattested_not_as_none():
+    """Absence must not read as knowledge.
+
+    The contract says silence in `unresolved` claims nothing is open. Nothing
+    checks that claim, so the layer says so rather than printing a bare
+    "none" that a reader takes for a clean check.
+    """
+    result = verify(_handoff_declaring_nothing_open(),
+                    expectation=_expectation_requiring_nothing_open())
+    entry = layer(result, contract.LAYER_CONFLICTS)
+
+    assert contract.SILENCE_UNATTESTED in {f["code"] for f in result["findings"]}
+    assert "unattested" in entry["detail"]
+    assert entry["detail"] != "none"
+
+
+def test_silence_is_a_note_and_never_fails_the_run():
+    """An unexamined claim is not a defect, and must not become an exit code."""
+    result = verify(_handoff_declaring_nothing_open(),
+                    expectation=_expectation_requiring_nothing_open())
+    assert result["verdict"] == "PASS"
+    assert layer(result, contract.LAYER_CONFLICTS)["status"] == VERIFIED
+    assert contract.SILENCE_UNATTESTED not in codes(result)
+
+
+def test_declared_open_issues_are_not_silence():
+    """A producer that named its open questions is not being silent."""
+    result = verify(cases.clean(), expectation=cases.expectation())
+    assert contract.SILENCE_UNATTESTED not in {
+        f["code"] for f in result["findings"]}
+    assert layer(result, contract.LAYER_CONFLICTS)["detail"] == "none, 1 open"
+
+
+def test_an_expectation_requiring_an_open_issue_attests_the_silence():
+    """When the repository names what must stay open, the claim is checked."""
+    expectation = {**cases.expectation(), "required_unresolved": ["U1"]}
+    result = verify(_handoff_declaring_nothing_open(), expectation=expectation)
+    assert contract.SILENCE_UNATTESTED not in {
+        f["code"] for f in result["findings"]}
+    assert "unattested" not in layer(result, contract.LAYER_CONFLICTS)["detail"]
+
+
 def test_an_expectation_that_names_no_root_is_unaffected():
     """The compatibility guarantee for every expectation file written so far.
 

@@ -12,7 +12,7 @@ import sys
 import textwrap
 from typing import Any
 
-from .contract import REFUSE, REVIEW, SAFE, SEVERITY_FAIL
+from .contract import LAYERS, REFUSE, REVIEW, SAFE, SEVERITY_FAIL
 from .verify import FAILED, NOT_ESTABLISHED, VERIFIED
 
 _WIDTH = 22
@@ -59,6 +59,24 @@ def _wrap(text: str, indent: str) -> list[str]:
     return [indent + line for line in (wrapped or [""])]
 
 
+def _census(layers: list[dict[str, Any]]) -> str:
+    """What was assessed, and what was not.
+
+    A census, never a score: the counts are printed side by side and never
+    combined, for the same reason the layers themselves are not averaged. Its
+    job is to stop eight lines of mostly-green being read as eight checks that
+    passed, and to make an early structural exit visible as unrun rather than
+    absent.
+    """
+    counted = [(sum(1 for entry in layers if entry["status"] == status), label)
+               for status, (_, label) in _STATUS_STYLE.items()]
+    parts = [f"{count} {label}" for count, label in counted if count]
+    unrun = len(LAYERS) - len(layers)
+    if unrun > 0:
+        parts.append(f"{unrun} not run")
+    return " \u00b7 ".join(parts)
+
+
 def render_verify(result: dict[str, Any], *, verbose: bool = False,
                   stream=None) -> str:
     stream = stream or sys.stdout
@@ -69,6 +87,7 @@ def render_verify(result: dict[str, Any], *, verbose: bool = False,
     heading = _paint(verdict, _VERDICT_STYLE[verdict], colour)
     source = result.get("source")
     lines.append(f"{heading}  {source}" if source else heading)
+    lines.append(f"      {_census(result['layers'])}")
 
     for layer in result["layers"]:
         code, label = _STATUS_STYLE[layer["status"]]

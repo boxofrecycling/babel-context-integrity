@@ -78,6 +78,38 @@ def test_diff_review_exits_zero_unless_strict(tmp_path, capsys):
     assert "REVIEW" in capsys.readouterr().out
 
 
+def test_the_census_counts_layers_and_never_averages_them(fixtures, capsys):
+    """A census, not a score.
+
+    Eight mostly-green lines read as eight checks that passed. The census is
+    the one figure that cannot be skimmed past -- and it stays a set of counts
+    printed side by side, because a single number is how a verifier turns into
+    a rubber stamp.
+    """
+    main(["verify", fixtures["clean"]])
+    out = capsys.readouterr().out
+    assert "7 verified" in out
+    assert "1 not established" in out
+    assert "%" not in out
+    assert "score" not in out.lower()
+
+
+def test_the_census_reports_layers_that_never_ran(tmp_path, capsys):
+    """A structural exit must not look like a clean short report."""
+    import json as _json
+
+    from babelci.lab import cases as lab_cases
+
+    broken = lab_cases.clean()
+    del broken["provenance"]
+    path = tmp_path / "broken.json"
+    path.write_text(_json.dumps(broken), encoding="utf-8")
+
+    main(["verify", str(path)])
+    out = capsys.readouterr().out
+    assert "not run" in out
+
+
 def test_missing_file_is_a_usage_error(capsys):
     assert main(["verify", "/nonexistent/handoff.json"]) == EXIT_USAGE
     assert "cannot read" in capsys.readouterr().err

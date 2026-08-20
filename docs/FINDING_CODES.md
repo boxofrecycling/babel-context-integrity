@@ -161,6 +161,13 @@ resolves an issue necessarily removes that issue from the artifact.
 
 ## Authority agreement
 
+### `SILENCE_UNATTESTED` — severity `note`
+The artifact declares nothing open, and no expectation required an open issue
+to survive. The contract says silence in `unresolved` is a claim that nothing
+is unresolved; this note says that claim is the producer's alone and was not
+checked. Does not fail the run. It is here so an empty list cannot be read as
+a checked one.
+
 ### `AUTHORITY_DISAGREEMENT`
 The two independent encoders do not describe the same world. The artifact is
 ambiguous. **No vote is taken** and no winner is picked — the disagreement is

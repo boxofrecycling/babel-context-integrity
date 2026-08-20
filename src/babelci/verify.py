@@ -34,7 +34,8 @@ from .contract import (
     REQUIRED_DECISION_MISSING, REQUIRED_OBJECT_MISSING,
     RETAINED_CONSTRAINT_MISSING,
     RETAINED_CONSTRAINT_MODIFIED,
-    SEVERITY_FAIL, SEVERITY_NOTE, SUMMARY_COMMITMENT_MISMATCH, SUMMARY_DOMAIN,
+    SEVERITY_FAIL, SEVERITY_NOTE, SILENCE_UNATTESTED,
+    SUMMARY_COMMITMENT_MISMATCH, SUMMARY_DOMAIN,
     TASK_IDENTITY_MISMATCH, UNRESOLVED_ISSUE_UNDECLARED,
 )
 from . import schema as schema_module
@@ -257,7 +258,22 @@ def verify(handoff: Any, *, expectation: dict[str, Any] | None = None,
     # -- layer 6: conflicts -------------------------------------------------
     layers.open(LAYER_CONFLICTS)
     conflicts = _check_conflicts(handoff, layers, expectation)
-    layers.note(LAYER_CONFLICTS, "none" if not conflicts else f"{conflicts} found")
+    # `unresolved` is the one field whose emptiness is itself an assertion --
+    # the contract says silence here claims nothing is open. Nothing checks
+    # that claim unless an expectation names an issue that must survive, so an
+    # empty list is the producer's word, unexamined. Reporting it as a bare
+    # "none" lets absence read as knowledge, which is the failure this layer is
+    # least able to afford.
+    open_issues = handoff.get("unresolved", []) or []
+    attested = bool((expectation or {}).get("required_unresolved"))
+    if not open_issues and not attested:
+        layers.fail(LAYER_CONFLICTS, SILENCE_UNATTESTED,
+                    "this artifact declares nothing open and no expectation "
+                    "required an open issue to survive it; that nothing is "
+                    "unresolved is the producer's claim alone and was not "
+                    "checked here",
+                    severity=SEVERITY_NOTE)
+    layers.note(LAYER_CONFLICTS, _conflict_detail(conflicts, open_issues, attested))
 
     # -- layer 7: authority agreement ---------------------------------------
     layers.open(LAYER_AUTHORITIES)
@@ -459,6 +475,16 @@ def _check_provenance(handoff: dict[str, Any], layers: _Layers,
     if layers.state[LAYER_PROVENANCE] == VERIFIED:
         layers.note(LAYER_PROVENANCE,
                     f"{len(object_ids)} objects to {root}")
+
+
+def _conflict_detail(conflicts: int, open_issues: list[Any],
+                     attested: bool) -> str:
+    """One line saying what was found and what was merely declared."""
+    if conflicts:
+        return f"{conflicts} found"
+    if open_issues:
+        return f"none, {len(open_issues)} open"
+    return "none, 0 open" if attested else "none, 0 open (unattested)"
 
 
 def _check_conflicts(handoff: dict[str, Any], layers: _Layers,

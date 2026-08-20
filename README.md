@@ -15,12 +15,13 @@ Babel gives that story a contract, and checks it.
 $ babelci verify examples/clean-handoff.json
 
 PASS  examples/clean-handoff.json
+      7 verified · 1 not established
   structure ............. verified   contract 0.1, 4 objects
   identity .............. verified   agent-a -> agent-b
   checkpoint ............ verified   cp-4412-01
   provenance ............ verified   4 objects to repo@a1b2c3d4
   retained constraints .. verified   2 MUST, 1 SHOULD
-  conflicts ............. verified   none
+  conflicts ............. verified   none, 1 open
   authority agreement ... verified   3 encodings agree
   external truth ........ not established
 ```
@@ -32,12 +33,13 @@ legacy session table yet*. The prose summary still reads fine:
 $ babelci verify examples/corrupted-handoff.json --expect examples/expect.json
 
 FAIL  examples/corrupted-handoff.json
+      6 verified · 1 FAILED · 1 not established
   structure ............. verified   contract 0.1, 4 objects
   identity .............. verified   agent-b -> agent-c
   checkpoint ............ verified   cp-4412-02
   provenance ............ verified   4 objects to repo@a1b2c3d4
   retained constraints .. FAILED
-  conflicts ............. verified   none
+  conflicts ............. verified   none, 1 open
   authority agreement ... verified   3 encodings agree
   external truth ........ not established
 
@@ -78,12 +80,13 @@ wrong branch. Every fact it wrote down is wrong. Every check passes:
 $ babelci verify examples/common-mode-handoff.json
 
 FAIL  examples/common-mode-handoff.json
+      7 verified · 1 FAILED
   structure ............. verified   contract 0.1, 4 objects
   identity .............. verified   agent-b -> agent-c
   checkpoint ............ verified   cp-4412-02
   provenance ............ verified   4 objects to repo@a1b2c3d4
   retained constraints .. verified   2 MUST, 1 SHOULD
-  conflicts ............. verified   none
+  conflicts ............. verified   none, 1 open
   authority agreement ... verified   3 encodings agree
   external truth ........ FAILED
 

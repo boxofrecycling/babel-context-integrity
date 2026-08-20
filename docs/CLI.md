@@ -51,6 +51,7 @@ constraint layers gain teeth.
 ```console
 $ babelci verify .babel/handoff.json --expect .babel/expect.json
 PASS  .babel/handoff.json
+      7 verified · 1 not established
   structure ............. verified   contract 0.1, 5 objects
   identity .............. verified   agent-a -> agent-b
   checkpoint ............ verified   cp-4412-01

@@ -29,12 +29,13 @@ Babel gives the handoff a machine-readable contract and checks it.
 $ babelci verify examples/corrupted-handoff.json --expect examples/expect.json
 
 FAIL  examples/corrupted-handoff.json
+      6 verified · 1 FAILED · 1 not established
   structure ............. verified   contract 0.1, 4 objects
   identity .............. verified   agent-b -> agent-c
   checkpoint ............ verified   cp-4412-02
   provenance ............ verified   4 objects to repo@a1b2c3d4
   retained constraints .. FAILED
-  conflicts ............. verified   none
+  conflicts ............. verified   none, 1 open
   authority agreement ... verified   3 encodings agree
   external truth ........ not established
 

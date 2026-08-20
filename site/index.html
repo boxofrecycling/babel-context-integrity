@@ -203,12 +203,13 @@ footer a { color: var(--muted); }
 <pre><span class="p">$</span> babelci verify .babel/handoff.json --expect .babel/expect.json
 
 <span class="bad">FAIL</span>  .babel/handoff.json
+      6 verified · 1 FAILED · 1 not established
   structure ............. <span class="ok">verified</span>   contract 0.1, 5 objects
   identity .............. <span class="ok">verified</span>   agent-b -&gt; agent-c
   checkpoint ............ <span class="ok">verified</span>   cp-4412-02
   provenance ............ <span class="ok">verified</span>   5 objects to repo@a1b2c3d4
   retained constraints .. <span class="bad">FAILED</span>
-  conflicts ............. <span class="ok">verified</span>   none
+  conflicts ............. <span class="ok">verified</span>   none, 1 open
   authority agreement ... <span class="ok">verified</span>   3 encodings agree
   external truth ........ <span class="warn">not established</span>
 
@@ -240,12 +241,13 @@ it is wrong. Every internal check passes:</p>
 <pre><span class="p">$</span> babelci verify examples/common-mode-handoff.json
 
 <span class="bad">FAIL</span>  examples/common-mode-handoff.json
+      7 verified · 1 FAILED
   structure ............. <span class="ok">verified</span>   contract 0.1, 4 objects
   identity .............. <span class="ok">verified</span>   agent-b -&gt; agent-c
   checkpoint ............ <span class="ok">verified</span>   cp-4412-02
   provenance ............ <span class="ok">verified</span>   4 objects to repo@a1b2c3d4
   retained constraints .. <span class="ok">verified</span>   2 MUST, 1 SHOULD
-  conflicts ............. <span class="ok">verified</span>   none
+  conflicts ............. <span class="ok">verified</span>   none, 1 open
   authority agreement ... <span class="ok">verified</span>   3 encodings agree
   external truth ........ <span class="bad">FAILED</span>
 
