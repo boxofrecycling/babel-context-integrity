@@ -1,9 +1,10 @@
 # Release checklists
 
-## v0.2.0 — prepared, not published
+## v0.2.0 — published 2026-08-21
 
-Nothing below has been done. The working tree is prepared and the branch is
-unpushed; no tag exists and no archive has been built.
+Tag `v0.2.0` → `1275294cc6aec83e8f55c552c736b8508122733c`. GitHub release and
+PyPI publication both complete and verified; see **Published** below for the
+evidence each item rests on.
 
 ### Prepared
 
@@ -25,22 +26,44 @@ unpushed; no tag exists and no archive has been built.
       requires it. `release/v0.1.0-notes.md` is deliberately unchanged.
       Reasoning in `docs/CLAIM_AUDIT.md`.
 
-### Needs a human
+### Published
 
-- [ ] Review the release text. Nothing here has been reviewed by anyone.
-- [ ] Decide whether to merge the branch to `main` before tagging.
-- [ ] `rm -rf dist && python -m build && python -m twine check dist/*`, then
-      record the digests — `release/DIGESTS.txt` still describes v0.1.0 only.
-- [ ] Disclosure scan on the working tree **and** both archives
-      (`docs/DISCLOSURE_AUDIT.md` records the v0.1.0 scan only).
-- [ ] `git tag -a v0.2.0`, push branch and tag, then
-      `gh release create v0.2.0 --notes-file release/v0.2.0-notes.md`.
-- [ ] TestPyPI, install into a clean venv, run `babelci demo`, then PyPI.
-- [ ] Decide whether 0.2.0 warrants any announcement. It is a point release;
-      the `launch/` drafts were written for v0.1.0 and should not be reused
-      without rereading them.
+- [x] Release text reviewed; five accuracy findings (R1–R5) raised and resolved
+      before the tag. One further finding — the unbounded "no language model was
+      involved in any of this" in three unpublished launch drafts — was found in
+      pre-push review and narrowed to the results claim it supports.
+- [x] Merged to `main`, fast-forward, matching the repository's linear history.
+- [x] Built and digests recorded. `release/DIGESTS.txt` gains a v0.2.0 section
+      above the preserved v0.1.0 record. Bit-reproducible across three builds
+      (twice from the tree, once from a fresh clone) and again on a CI runner
+      rebuilding from the tag. `twine check` passed both artifacts.
+- [x] Disclosure scan on the working tree **and** both archives, at the released
+      commit, recorded in `docs/DISCLOSURE_AUDIT.md`. Clean; one placeholder
+      email in the landing-page form, present in no archive.
+- [x] `git tag -a v0.2.0`, pushed `main` then the tag, then
+      `gh release create v0.2.0 --notes-file release/v0.2.0-notes.md` with both
+      artifacts attached. The release body is byte-identical to the notes file.
+- [x] Published to PyPI. **TestPyPI was not used and could not be**: this project
+      holds no API token by design and the Trusted Publishing workflow has no
+      TestPyPI target, so `twine upload --repository testpypi` — inherited from
+      the v0.1.0 sequence below, written before that workflow existed — is not a
+      runnable step. The workflow's own `dry-run: true` was run first instead: it
+      re-established three-way byte equality, passed `twine check`, and smoke-
+      tested the wheel in a `--network=none` container, stopping before upload.
+      The real run then uploaded via Trusted Publishing, `200 OK` for both files.
+- [x] Verified from the index: `pip install babel-context-integrity` into a clean
+      venv resolves 0.2.0, `babelci --version` reports 0.2.0, `babelci lab`
+      exits 0 with the expected digest, and PyPI's recorded sha256 for both files
+      matches `release/DIGESTS.txt`.
 
-Steps up to and including the tag are reversible. Pushing is not.
+### Still open
+
+- [ ] Decide whether 0.2.0 warrants any announcement. It is a point release; the
+      `launch/` drafts were written for v0.1.0, and their provenance wording was
+      corrected during this release, so they need rereading before any use.
+- [ ] Update the stale `twine upload --repository testpypi` lines in the v0.1.0
+      publication sequence below, which no longer describe how this project
+      publishes. Left in place here as the historical record of that release.
 
 ---
 

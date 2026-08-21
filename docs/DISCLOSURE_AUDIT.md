@@ -88,6 +88,54 @@ integrations/generic/run.sh        completed
 lab digest, two runs, two trees    byte-identical
 ```
 
+## v0.2.0 — scanned 2026-08-21
+
+Re-run at commit `1275294cc6aec83e8f55c552c736b8508122733c`, which tag `v0.2.0`
+points at, against three surfaces: the working tree, the extracted `sdist`, and
+the extracted `wheel`. The archives scanned were the exact bytes published —
+sha256 `85439f40…` (wheel) and `358901005…` (sdist), matching
+[`../release/DIGESTS.txt`](../release/DIGESTS.txt), the GitHub release assets
+and the digests PyPI records.
+
+Same checks as the v0.1.0 scan above, plus a pattern for PyPI API tokens
+(`pypi-AgEI…`), added because this release was the first published through the
+Trusted Publishing workflow and it was worth confirming no token had been
+introduced anywhere. None exists; the workflow uses a short-lived OIDC token
+and stores nothing.
+
+| Check | Tree | sdist | wheel |
+|---|---|---|---|
+| API keys, tokens, private keys, PyPI tokens | none | none | none |
+| Local filesystem paths (`/Users/…`, `/home/…`, `C:\…`) | none | none | none |
+| Machine hostnames or usernames | none | none | none |
+| Email addresses | one, below | none | none |
+| Private research vocabulary or lane names | none | none | none |
+| Private repository commit identifiers | none | none | none |
+
+**The one match, and why it is not a finding.** `site/index.html` contains
+`placeholder="you@company.com"` on the landing page's waitlist input. It is
+placeholder text in a form that collects nothing, which the page itself states.
+It is not in either archive.
+
+Nothing was removed or changed as a result of this scan.
+
+### What changed in v0.2.0 that this scan covers
+
+Four externally visible surfaces were added since the v0.1.0 scan —
+`SILENCE_UNATTESTED`, `PROVENANCE_ROOT_MISMATCH`, the coverage census and
+`babelci carry` — along with a new module, a new test file, and regenerated
+console blocks across the documentation and the unpublished launch drafts. All
+are inside the tree scan; the module is inside both archives.
+[`CLAIM_AUDIT.md`](CLAIM_AUDIT.md) covers the same four surfaces against
+`LIMITS.md`, which is a different question from disclosure and is recorded
+separately.
+
+### Boundary of this scan
+
+It was run on the same day as publication, by the same party that prepared the
+release, using the pattern set above. It establishes that those patterns did not
+match, and nothing more. The v0.1.0 caveats below apply unchanged.
+
 ## What this audit does not establish
 
 - It does not establish that the code is free of defects. It is a disclosure
