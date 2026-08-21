@@ -89,10 +89,15 @@ haven't found elsewhere is the layer separation, the "not established" state,
 two encoders with no tiebreak, and an external-truth layer that can reject what
 everything else accepted.
 
-Also honest: no language model was involved in any of this. The lab agents are
-fixtures. What's real is the verifier's behaviour on them. A controlled
-evaluation with real agent handoffs is designed and written up, and hasn't been
-run.
+Also honest, and worth separating: no language model produced any *result*
+here. The lab agents are deterministic fixtures, the scenario is fictional, and
+what's real is the verifier's behaviour on them. A controlled evaluation with
+real agent handoffs is designed and written up, and hasn't been run.
+
+Development is a different question, and the answer is yes: parts of this were
+written with AI assistance. That isn't evidence of anything either way, which is
+rather the point — the claims rest on artifacts you can rebuild and tests you
+can run, not on who or what typed them.
 
 Apache-2.0. Technical report, related-work review and limits doc in the repo.
 The limits doc is the one I'd read first.
@@ -122,11 +127,17 @@ runtime; OTel describes what happened for observability. Babel checks a
 persisted artifact after the fact, across runtimes, possibly days later, with
 no trust in the tool that wrote it.
 
-**"You said no model was involved — so what has this actually shown?"**
+**"You said no model produced a result — so what has this actually shown?"**
 That the verifier behaves as specified on fifteen constructed failure classes,
 and that internal consistency provably cannot distinguish a true handoff from a
 coherent false one. Nothing about how often real agents fail. That is the next
 study and it hasn't been run. Do not soften this.
+
+**"But you used AI to build it."**
+Yes, in part, and it is in the repo's changelog rather than buried. It is not
+evidence of correctness and not evidence against it. Everything asserted here is
+a rebuildable artifact or a runnable test; treating authorship as evidence is
+the move this project exists to argue against. Answer it plainly and move on.
 
 **"32.3% overhead is a lot."**
 It is. It is also measured and reported rather than hidden. The private

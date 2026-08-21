@@ -40,8 +40,11 @@ Apache-2.0.
 
 Prior art, since this space is crowded: CLAN is a handoff file format with
 checksums, JSON Schema and provenance, and the agent-handoff GitHub topic has
-20+ projects. And no language model was involved in any of this — the lab
-agents are fixtures. What's real is the verifier's behaviour on them.
+20+ projects. And no language model produced any result here — the lab agents
+are deterministic fixtures, and what's real is the verifier's behaviour on them.
+Development is separate: parts of this were written with AI assistance, which is
+evidence of nothing. The claims rest on artifacts you can rebuild and tests you
+can run.
 
 [link]
 

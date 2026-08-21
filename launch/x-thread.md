@@ -88,8 +88,12 @@ Honest scoping, because this space is crowded:
 structured agent handoffs aren't new. CLAN is a handoff format with checksums,
 schema and provenance. The agent-handoff GitHub topic has 20+ projects.
 
-And: no language model was involved in any of this. The lab agents are
-fixtures.
+And: no language model produced any result here. The lab agents are
+deterministic fixtures.
+
+Development is a separate question — parts of this were written with AI
+assistance. That's evidence of nothing. The claims rest on rebuildable
+artifacts and runnable tests.
 
 ---
 
