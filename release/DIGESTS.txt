@@ -1,3 +1,38 @@
+# Distribution digests — v0.2.0
+
+Built with `python -m build` at tag `v0.2.0`.
+
+```
+85439f405f0964ec30ef2977af6227511c5d1bb0b058ae6ed37e097af84bf5c6  babel_context_integrity-0.2.0-py3-none-any.whl
+358901005bb3b1f51693d3e1718b3795d1097223768349e943ef97ecb33e2e65  babel_context_integrity-0.2.0.tar.gz
+```
+
+Sizes:
+```
+babel_context_integrity-0.2.0-py3-none-any.whl         57297 bytes
+babel_context_integrity-0.2.0.tar.gz                   145298 bytes
+```
+
+## Reproducibility
+
+**Both artifacts are bit-reproducible.** The digests above were confirmed
+identical across three builds: twice from the working tree and once from a
+fresh clone of the merged `main`, on the same Python.
+
+Check it yourself:
+
+```bash
+git clone https://github.com/boxofrecycling/babel-context-integrity
+cd babel-context-integrity && git checkout v0.2.0
+python -m venv .venv && ./.venv/bin/pip install build
+./.venv/bin/python -m build && shasum -a 256 dist/*
+```
+
+`release/DIGESTS.txt` is excluded from the sdist — confirmed again for this
+release by listing the archive. An archive cannot contain its own hash.
+
+---
+
 # Distribution digests — v0.1.0
 
 Built with `python -m build` at tag `v0.1.0`.
